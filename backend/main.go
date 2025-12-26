@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log/slog"
 	"net/http"
 	"os"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/lmittmann/tint"
+	"gorm.io/gorm"
 )
 
 func main() {
@@ -17,7 +19,7 @@ func main() {
 		Level:     slog.LevelInfo,
 	}))
 
-	_, err := db.InitDB(os.Getenv("GOOSE_DBSTRING"))
+	g_db, err := db.InitDB(os.Getenv("GOOSE_DBSTRING"))
 
 	if err != nil {
 		logger.Error("Error when connecting to db", "error", err)
@@ -27,6 +29,11 @@ func main() {
 	r := gin.Default()
 	r.GET("/health", func(ctx *gin.Context) {
 		ctx.String(http.StatusOK, "healthy")
+	})
+
+	r.GET("/users", func(ctx *gin.Context) {
+		users, _ := gorm.G[db.User](g_db).Find(context.Background())
+		ctx.JSON(http.StatusOK, users)
 	})
 
 	r.Run()
