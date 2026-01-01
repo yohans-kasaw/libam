@@ -15,5 +15,8 @@ migrate-down: migrate
 server:
 	@go build -o ./build/server .
 
-dev: server
-	@./build/server
+run:
+	@go run .
+
+dev:
+	air
