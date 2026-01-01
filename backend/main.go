@@ -19,7 +19,13 @@ func main() {
 		Level:     slog.LevelInfo,
 	}))
 
-	g_db, err := db.InitDB(os.Getenv("GOOSE_DBSTRING"))
+	dsn := os.Getenv("GOOSE_DBSTRING")
+	if dsn == ""{
+		logger.Error("GOOSE_DBSTRING is not found in env variabls")
+		os.Exit(1)
+	}
+
+	g_db, err := db.InitDB(dsn)
 
 	if err != nil {
 		logger.Error("Error when connecting to db", "error", err)

@@ -14,7 +14,14 @@ import (
 var m gorm.Migrator
 
 func init() {
-	g_db, err := db.InitDB(os.Getenv("GOOSE_DBSTRING"))
+
+	dsn := os.Getenv("GOOSE_DBSTRING")
+	if dsn == "" {
+		log.Print("GOOSE_DBSTRING is not found in env variabls")
+		os.Exit(1)
+	}
+
+	g_db, err := db.InitDB(dsn)
 	if err != nil {
 		log.Print("Error when connecting to db", err)
 		os.Exit(1)
