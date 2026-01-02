@@ -6,6 +6,9 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"libam/db"
 
@@ -61,7 +64,26 @@ func main() {
 		Handler: r,
 	}
 
-	if err := server.ListenAndServe(); err != nil {
-		logger.Error("Error Listening", "err", err)
+	go func() {
+		if err := server.ListenAndServe(); err != nil {
+			if err == http.ErrServerClosed {
+				logger.Info("serever closed", "err", err)
+			} else {
+				logger.Error("Error while listening", "err", err)
+			}
+
+		}
+	}()
+
+	// block
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	<-ctx.Done()
+	stop() // allow force shutdown
+
+	// do gracefull quit
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+	if err := server.Shutdown(ctx); err == nil {
+		logger.Info("server gracefully shuteddown")
 	}
 }
