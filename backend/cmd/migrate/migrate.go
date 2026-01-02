@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"flag"
-	"libam/db"
+	"libam/database"
 	"log/slog"
 	"os"
 
@@ -26,13 +26,7 @@ func main() {
 	}
 	command := flag.Args()[0]
 
-	dsn := os.Getenv("GOOSE_DBSTRING")
-	if dsn == "" {
-		logger.Error("GOOSE_DBSTRING is not found in env variabls")
-		os.Exit(1)
-	}
-
-	g_db, err := db.InitDB(dsn)
+	g_db, err := database.NewDatabase(logger)
 	if err != nil {
 		logger.Error("Error when connecting to db", "error", err)
 		os.Exit(1)

@@ -3,7 +3,7 @@ package migrations
 import (
 	"context"
 	"database/sql"
-	"libam/db"
+	"libam/database"
 	"log"
 	"os"
 
@@ -14,14 +14,7 @@ import (
 var m gorm.Migrator
 
 func init() {
-
-	dsn := os.Getenv("GOOSE_DBSTRING")
-	if dsn == "" {
-		log.Print("GOOSE_DBSTRING is not found in env variabls")
-		os.Exit(1)
-	}
-
-	g_db, err := db.InitDB(dsn)
+	g_db, err := database.NewDatabase(nil)
 	if err != nil {
 		log.Print("Error when connecting to db", err)
 		os.Exit(1)
@@ -32,9 +25,9 @@ func init() {
 }
 
 func upCreateUser(ctx context.Context, tx *sql.Tx) error {
-	return m.CreateTable(&db.User{})
+	return m.CreateTable(&database.User{})
 }
 
 func downCreateUser(ctx context.Context, tx *sql.Tx) error {
-	return m.DropTable(&db.User{})
+	return m.DropTable(&database.User{})
 }
