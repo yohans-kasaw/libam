@@ -10,6 +10,7 @@ import (
 	"libam/db"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"github.com/lmittmann/tint"
 	"gorm.io/gorm"
 )
@@ -19,6 +20,12 @@ func main() {
 		AddSource: true,
 		Level:     slog.LevelInfo,
 	}))
+
+	err := godotenv.Load()
+	if err != nil {
+		logger.Error("Error loading .env file")
+		os.Exit(1)
+	}
 
 	dsn := os.Getenv("GOOSE_DBSTRING")
 	if dsn == "" {

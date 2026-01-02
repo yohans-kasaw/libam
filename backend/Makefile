@@ -1,5 +1,3 @@
-.PHONY: server dev migrate migrate-up migrate-down
-
 -include .env
 export
 
@@ -15,8 +13,4 @@ migrate-down: migrate
 server:
 	@go build -o ./build/server .
 
-run:
-	@go run .
-
-dev:
-	air
+.PHONY: server dev migrate migrate-up migrate-down
