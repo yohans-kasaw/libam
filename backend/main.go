@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
@@ -20,7 +21,7 @@ func main() {
 	}))
 
 	dsn := os.Getenv("GOOSE_DBSTRING")
-	if dsn == ""{
+	if dsn == "" {
 		logger.Error("GOOSE_DBSTRING is not found in env variabls")
 		os.Exit(1)
 	}
@@ -42,5 +43,18 @@ func main() {
 		ctx.JSON(http.StatusOK, users)
 	})
 
-	r.Run()
+	port := os.Getenv("PORT")
+	if port == "" {
+		logger.Error("PORT is not found in env variabls")
+		os.Exit(1)
+	}
+
+	server := http.Server{
+		Addr:    fmt.Sprintf(":%v", port),
+		Handler: r,
+	}
+
+	if err := server.ListenAndServe(); err != nil {
+		logger.Error("Error Listening", "err", err)
+	}
 }
