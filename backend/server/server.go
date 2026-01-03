@@ -15,12 +15,7 @@ type Server struct {
 }
 
 func NewServer(logger *slog.Logger) *http.Server {
-	db, err := database.NewDatabase(logger)
-
-	if err != nil {
-		logger.Error("Error when connecting to db", "error", err)
-		os.Exit(1)
-	}
+	db := database.NewDatabase(logger)
 
 	s := &Server{
 		db: db,

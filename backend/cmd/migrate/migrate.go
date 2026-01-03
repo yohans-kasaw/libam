@@ -26,11 +26,7 @@ func main() {
 	}
 	command := flag.Args()[0]
 
-	db, err := database.NewDatabase(logger)
-	if err != nil {
-		logger.Error("Error when connecting to db", "error", err)
-		os.Exit(1)
-	}
+	db := database.NewDatabase(logger)
 
 	db_sql, _ := db.DB()
 	goose.RunContext(context.Background(), command, db_sql, ".")

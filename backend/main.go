@@ -32,9 +32,9 @@ func main() {
 	go func() {
 		if err := server.ListenAndServe(); err != nil {
 			if err == http.ErrServerClosed {
-				logger.Info("serever closed", "err", err)
+				logger.Info("serever closed", "error", err)
 			} else {
-				logger.Error("Error while listening", "err", err)
+				logger.Error("Error while listening", "error", err)
 			}
 
 		}

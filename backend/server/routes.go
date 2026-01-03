@@ -18,7 +18,28 @@ func (s *Server) RegisterRouts() *gin.Engine {
 }
 
 func (s *Server) health(ctx *gin.Context) {
-	ctx.String(http.StatusOK, "healthy")
+	db, _ := s.db.DB()
+	if err := db.Ping(); err != nil {
+		ctx.JSON(http.StatusOK, gin.H{
+			"error": err.Error(),
+		})
+
+		return
+	}
+
+	stats := make(map[string]any)
+	stats["status"] = "okay"
+
+	dbStats := db.Stats()
+	stats["open_connections"] = dbStats.OpenConnections
+	stats["in_use"] = dbStats.InUse
+	stats["idle"] = dbStats.Idle
+	stats["wait_count"] = dbStats.WaitCount
+	stats["wait_duration"] = dbStats.WaitDuration.String()
+	stats["max_idle_closed"] = dbStats.MaxIdleClosed
+	stats["max_lifetime_closed"] = dbStats.MaxLifetimeClosed
+
+	ctx.JSON(http.StatusOK, stats)
 }
 
 func (s *Server) users(ctx *gin.Context) {
