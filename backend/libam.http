@@ -1,6 +1,11 @@
 ##
 @host = http://localhost:8080
 
+
+### ping 
+GET /ping HTTP/1.1
+Host: {{host}}
+
 ### health 
 GET /health HTTP/1.1
 Host: {{host}}

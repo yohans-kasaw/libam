@@ -11,16 +11,21 @@ import (
 
 func (s *Server) RegisterRouts() *gin.Engine {
 	r := gin.Default()
+	r.GET("/ping", s.ping)
 	r.GET("/health", s.health)
 	r.GET("/users", s.users)
 
 	return r
 }
 
+func (s *Server) ping(ctx *gin.Context) {
+	ctx.String(http.StatusOK, "pong")
+}
+
 func (s *Server) health(ctx *gin.Context) {
 	db, _ := s.db.DB()
 	if err := db.Ping(); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{
+		ctx.JSON(http.StatusServiceUnavailable, gin.H{
 			"error": err.Error(),
 		})
 
