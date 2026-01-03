@@ -14,13 +14,13 @@ import (
 var m gorm.Migrator
 
 func init() {
-	g_db, err := database.NewDatabase(nil)
+	db, err := database.NewDatabase(nil)
 	if err != nil {
 		log.Print("Error when connecting to db", err)
 		os.Exit(1)
 	}
 
-	m = g_db.Migrator()
+	m = db.Migrator()
 	goose.AddMigrationContext(upCreateUser, downCreateUser)
 }
 
