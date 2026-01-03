@@ -5,7 +5,8 @@ tmp_dir = "tmp"
 
 [build]
   cmd = "go build -o ./build/server ."
-  bin = "./build/server"
+  bin = ""
+  entrypoint = ["./build/server"]
   delay = 500
   exclude_dir = ["build", "testdata"]
   args_bin = []
