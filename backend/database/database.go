@@ -8,7 +8,11 @@ import (
 	"gorm.io/gorm"
 )
 
-func NewDatabase(logger *slog.Logger) *gorm.DB {
+type Database struct {
+	Db *gorm.DB
+}
+
+func NewDatabase(logger *slog.Logger) *Database {
 	dsn := os.Getenv("GOOSE_DBSTRING")
 	if dsn == "" {
 		if logger != nil {
@@ -24,5 +28,7 @@ func NewDatabase(logger *slog.Logger) *gorm.DB {
 		os.Exit(1)
 	}
 
-	return db
+	return &Database{
+		Db: db,
+	}
 }

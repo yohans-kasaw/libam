@@ -4,8 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"libam/database"
-	"log"
-	"os"
 
 	"github.com/pressly/goose/v3"
 	"gorm.io/gorm"
@@ -14,7 +12,7 @@ import (
 var m gorm.Migrator
 
 func init() {
-	db := database.NewDatabase(nil)
+	db := database.NewDatabase(nil).Db
 	m = db.Migrator()
 	goose.AddMigrationContext(upCreateUser, downCreateUser)
 }

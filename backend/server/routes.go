@@ -1,19 +1,16 @@
 package server
 
 import (
-	"context"
-	"libam/database"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
 func (s *Server) RegisterRouts() *gin.Engine {
 	r := gin.Default()
 	r.GET("/ping", s.ping)
 	r.GET("/health", s.health)
-	r.GET("/users", s.users)
+	r.GET("/users", s.getAllUsers)
 
 	return r
 }
@@ -23,7 +20,7 @@ func (s *Server) ping(ctx *gin.Context) {
 }
 
 func (s *Server) health(ctx *gin.Context) {
-	db, _ := s.db.DB()
+	db, _ := s.database.Db.DB()
 	if err := db.Ping(); err != nil {
 		ctx.JSON(http.StatusServiceUnavailable, gin.H{
 			"error": err.Error(),
@@ -45,9 +42,4 @@ func (s *Server) health(ctx *gin.Context) {
 	stats["max_lifetime_closed"] = dbStats.MaxLifetimeClosed
 
 	ctx.JSON(http.StatusOK, stats)
-}
-
-func (s *Server) users(ctx *gin.Context) {
-	users, _ := gorm.G[database.User](s.db).Find(context.Background())
-	ctx.JSON(http.StatusOK, users)
 }

@@ -6,19 +6,17 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
-
-	"gorm.io/gorm"
 )
 
 type Server struct {
-	db *gorm.DB
+	database *database.Database
 }
 
 func NewServer(logger *slog.Logger) *http.Server {
-	db := database.NewDatabase(logger)
+	database := database.NewDatabase(logger)
 
 	s := &Server{
-		db: db,
+		database: database,
 	}
 
 	port := os.Getenv("PORT")
