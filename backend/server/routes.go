@@ -8,9 +8,11 @@ import (
 
 func (s *Server) RegisterRouts() *gin.Engine {
 	r := gin.Default()
+
 	r.GET("/ping", s.ping)
 	r.GET("/health", s.health)
-	r.GET("/users", s.getAllUsers)
+	r.GET("/user", s.getAllUsers)
+	r.POST("/user", s.createUser)
 
 	return r
 }

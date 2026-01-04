@@ -17,3 +17,8 @@ func (db *Database) GetAllUsers() []User {
 
 	return users
 }
+
+
+func (db *Database) CreateUser(user *User) error {
+	return gorm.G[User](db.Db).Create(context.Background(), user)
+}

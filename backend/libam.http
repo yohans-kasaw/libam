@@ -10,6 +10,16 @@ Host: {{host}}
 GET /health HTTP/1.1
 Host: {{host}}
 
-### users
-GET /users HTTP/1.1
+### all users
+GET /user HTTP/1.1
 Host: {{host}}
+
+### creat user
+POST /user HTTP/1.1
+Host: {{host}}
+
+{
+    "Name": "Yohans Kasaw",
+    "Email": "Yohans@gmail.com"
+}
+
