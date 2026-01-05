@@ -9,7 +9,7 @@ import (
 	"syscall"
 	"time"
 
-	"libam/server"
+	"libam/api"
 
 	"github.com/joho/godotenv"
 	"github.com/lmittmann/tint"
@@ -27,7 +27,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	server := server.NewServer(logger)
+	server := api.NewServer(logger)
 
 	go func() {
 		if err := server.ListenAndServe(); err != nil {

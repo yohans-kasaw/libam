@@ -1,27 +1,32 @@
-package server
+package api 
 
 import (
+	"libam/database"
+	"libam/repository"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-func (s *Server) RegisterRouts() *gin.Engine {
+func (s *Api) RegisterRouts() *gin.Engine {
 	r := gin.Default()
+
+	userRepository := repository.NewGormRepository[database.User](s.database)
+	userHandler := NewUserHandler(&userRepository)
 
 	r.GET("/ping", s.ping)
 	r.GET("/health", s.health)
-	r.GET("/user", s.getAllUsers)
-	r.POST("/user", s.createUser)
+	r.GET("/user", userHandler.list)
+	r.POST("/user", userHandler.create)
 
 	return r
 }
 
-func (s *Server) ping(ctx *gin.Context) {
+func (s *Api) ping(ctx *gin.Context) {
 	ctx.String(http.StatusOK, "pong")
 }
 
-func (s *Server) health(ctx *gin.Context) {
+func (s *Api) health(ctx *gin.Context) {
 	db, _ := s.database.Db.DB()
 	if err := db.Ping(); err != nil {
 		ctx.JSON(http.StatusServiceUnavailable, gin.H{

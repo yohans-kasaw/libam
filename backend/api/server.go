@@ -1,4 +1,4 @@
-package server
+package api
 
 import (
 	"fmt"
@@ -8,14 +8,14 @@ import (
 	"os"
 )
 
-type Server struct {
+type Api struct {
 	database *database.Database
 }
 
 func NewServer(logger *slog.Logger) *http.Server {
 	database := database.NewDatabase(logger)
 
-	s := &Server{
+	s := &Api{
 		database: database,
 	}
 

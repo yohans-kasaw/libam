@@ -1,4 +1,4 @@
-package server
+package api
 
 import (
 	"net/http"
@@ -9,7 +9,7 @@ import (
 )
 
 func TestPing(t *testing.T) {
-	s := Server{}
+	s := Api{}
 
 	r := gin.New()
 	r.GET("/ping", s.ping)
