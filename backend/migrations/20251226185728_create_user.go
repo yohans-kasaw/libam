@@ -12,7 +12,7 @@ import (
 var m gorm.Migrator
 
 func init() {
-	db := database.NewDatabase(nil).Db
+	db := database.NewDatabase().Db
 	m = db.Migrator()
 	goose.AddMigrationContext(upCreateUser, downCreateUser)
 }

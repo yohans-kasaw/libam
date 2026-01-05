@@ -13,8 +13,8 @@ import (
 
 type Api struct{}
 
-func NewServer(logger *slog.Logger) *http.Server {
-	db := database.NewDatabase(logger)
+func NewServer() *http.Server {
+	db := database.NewDatabase()
 
 	s := &Api{}
 
@@ -30,7 +30,7 @@ func NewServer(logger *slog.Logger) *http.Server {
 
 	port := os.Getenv("PORT")
 	if port == "" {
-		logger.Error("PORT is not found in env variabls")
+		slog.Error("PORT is not found in env variabls")
 		os.Exit(1)
 	}
 

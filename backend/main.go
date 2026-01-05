@@ -16,25 +16,28 @@ import (
 )
 
 func main() {
-	logger := slog.New(tint.NewHandler(os.Stdout, &tint.Options{
-		AddSource: true,
-		Level:     slog.LevelInfo,
-	}))
+	slog.SetDefault(slog.New(tint.NewHandler(
+		os.Stdout,
+		&tint.Options{
+			AddSource: true,
+			Level:     slog.LevelInfo,
+		},
+	)))
 
 	err := godotenv.Load()
 	if err != nil {
-		logger.Error("Error loading .env file")
+		slog.Error("Error loading .env file")
 		os.Exit(1)
 	}
 
-	server := api.NewServer(logger)
+	server := api.NewServer()
 
 	go func() {
 		if err := server.ListenAndServe(); err != nil {
 			if err == http.ErrServerClosed {
-				logger.Info("serever closed", "error", err)
+				slog.Info("server closed", "error", err)
 			} else {
-				logger.Error("Error while listening", "error", err)
+				slog.Error("Error while listening", "error", err)
 			}
 
 		}
@@ -49,6 +52,6 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 	if err := server.Shutdown(ctx); err == nil {
-		logger.Info("server gracefully shuteddown")
+		slog.Info("server gracefully shutdown")
 	}
 }

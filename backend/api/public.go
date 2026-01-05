@@ -13,7 +13,7 @@ func (s *Api) ping(ctx *gin.Context) {
 
 // TODO: authentication 
 func (s *Api) health(ctx *gin.Context) {
-	db, _ := database.NewDatabase(nil).Db.DB()
+	db, _ := database.NewDatabase().Db.DB()
 	if err := db.Ping(); err != nil {
 		ctx.JSON(http.StatusServiceUnavailable, gin.H{
 			"error": err.Error(),

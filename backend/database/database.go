@@ -12,19 +12,17 @@ type Database struct {
 	Db *gorm.DB
 }
 
-func NewDatabase(logger *slog.Logger) *Database {
+func NewDatabase() *Database {
 	dsn := os.Getenv("GOOSE_DBSTRING")
 	if dsn == "" {
-		if logger != nil {
-			logger.Error("GOOSE_DBSTRING is not found in env variabls")
-		}
+		slog.Error("GOOSE_DBSTRING is not found in env variabls")
 		os.Exit(1)
 	}
 
 	d := postgres.Open(dsn)
 	db, err := gorm.Open(d, &gorm.Config{})
 	if err != nil {
-		logger.Error("Error connecting to database", "error", err)
+		slog.Error("Error connecting to database", "error", err)
 		os.Exit(1)
 	}
 

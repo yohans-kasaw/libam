@@ -3,6 +3,7 @@ package api
 import (
 	"libam/database"
 	"libam/repository"
+	"log/slog"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -27,9 +28,9 @@ func (h *userHandler) create(ctx *gin.Context) {
 	var user UserDto
 
 	if err := ctx.ShouldBindJSON(&user); err != nil {
+		slog.Error("error creating user", "error", err)
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": "validation of your input is not correct",
-			"error":   err.Error(),
 		})
 		return
 	}
@@ -40,9 +41,9 @@ func (h *userHandler) create(ctx *gin.Context) {
 	})
 
 	if err != nil {
+		slog.Error("error getting users", "error", err)
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Unable to create user. Please try again later.",
-			"error":   err.Error(),
 		})
 		return
 	}

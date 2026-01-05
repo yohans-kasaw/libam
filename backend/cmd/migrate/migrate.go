@@ -26,7 +26,7 @@ func main() {
 	}
 	command := flag.Args()[0]
 
-	db := database.NewDatabase(logger).Db
+	db := database.NewDatabase().Db
 
 	db_sql, _ := db.DB()
 	goose.RunContext(context.Background(), command, db_sql, ".")
