@@ -15,11 +15,12 @@ GET /user HTTP/1.1
 Host: {{host}}
 
 ### creat user
-POST /user HTTP/1.1
+POST /signup HTTP/1.1
 Host: {{host}}
 
 {
     "Name": "Yohans Kasaw",
-    "Email": "Yohans@gmail.com"
+    "Email": "Yohans@gmail.com",
+    "Password": "Password@123"
 }
 

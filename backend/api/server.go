@@ -26,7 +26,8 @@ func NewServer() *http.Server {
 	r.GET("/ping", s.ping)
 	r.GET("/health", s.health)
 	r.GET("/user", userHandler.list)
-	r.POST("/user", userHandler.create)
+
+	r.POST("/signup", userHandler.create)
 
 	port := os.Getenv("PORT")
 	if port == "" {
