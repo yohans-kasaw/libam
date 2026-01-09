@@ -6,13 +6,9 @@ import (
 	"libam/repository"
 	"log/slog"
 	"net/http"
-	"os"
-	"strconv"
-	"time"
 	"unicode"
 
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -27,25 +23,15 @@ type LoginDto struct {
 	Password string `json:"password" binding:"required"`
 }
 
-type UserClaim struct {
-	jwt.RegisteredClaims
-}
-
 type userHandler struct {
-	repo      *repository.GormRepository[database.User]
-	jwtSecret string
+	repo *repository.GormRepository[database.User]
+	auth *Auth
 }
 
 func NewUserHandler(repo *repository.GormRepository[database.User]) *userHandler {
-	jwtSecret := os.Getenv("JWT_SIGNING_KEY")
-	if jwtSecret == "" {
-		slog.Error("JWT_SIGNING_KEY is not set in environment variables")
-		os.Exit(1)
-	}
-
 	return &userHandler{
-		repo:      repo,
-		jwtSecret: jwtSecret,
+		repo: repo,
+		auth: NewAuth(),
 	}
 }
 
@@ -78,7 +64,7 @@ func (h *userHandler) login(ctx *gin.Context) {
 		return
 	}
 
-	token, err := h.generateToken(user.ID)
+	token, err := h.auth.generateToken(user.ID)
 	if err != nil {
 		slog.Error("error signing token", "error", err)
 		ctx.JSON(http.StatusInternalServerError, gin.H{
@@ -135,7 +121,7 @@ func (h *userHandler) create(ctx *gin.Context) {
 		return
 	}
 
-	token, err := h.generateToken(newUser.ID)
+	token, err := h.auth.generateToken(newUser.ID)
 	if err != nil {
 		slog.Error("error signing token", "error", err)
 		// User created but token failed
@@ -162,20 +148,6 @@ func (h *userHandler) list(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, users)
-}
-
-func (h *userHandler) generateToken(userId uint) (string, error) {
-	claim := UserClaim{
-		jwt.RegisteredClaims{
-			Subject:   strconv.FormatUint(uint64(userId), 10),
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-		},
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
-
-	return token.SignedString([]byte(h.jwtSecret))
 }
 
 func validatePassword(password string) error {
