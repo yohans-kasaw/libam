@@ -30,3 +30,9 @@ func (r *GormRepository[T]) GetByID(id uint) (*T, error) {
 	err := r.db.First(&entity, id).Error
 	return &entity, err
 }
+
+func (r *GormRepository[T]) GetByEmail(email string) (*T, error) {
+	var entity T
+	err := r.db.Where("email = ?", email).First(&entity).Error
+	return &entity, err
+}

@@ -14,13 +14,23 @@ Host: {{host}}
 GET /user HTTP/1.1
 Host: {{host}}
 
+### login 
+POST /login HTTP/1.1
+Host: {{host}}
+
+{
+    "Email": "Yohans4@gmail.com",
+    "Password": "Password@123"
+}
+
+
 ### creat user
 POST /signup HTTP/1.1
 Host: {{host}}
 
 {
     "Name": "Yohans Kasaw",
-    "Email": "Yohans@gmail.com",
+    "Email": "Yohans6@gmail.com",
     "Password": "Password@123"
 }
 
