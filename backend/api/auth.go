@@ -1,8 +1,7 @@
 package api
 
 import (
-	"log/slog"
-	"os"
+	"libam/internal/pkg"
 	"strconv"
 	"time"
 
@@ -18,11 +17,7 @@ type UserClaim struct {
 }
 
 func NewAuth() *Auth {
-	jwtSecret := os.Getenv("JWT_SIGNING_KEY")
-	if jwtSecret == "" {
-		slog.Error("JWT_SIGNING_KEY is not set in environment variables")
-		os.Exit(1)
-	}
+	jwtSecret := pkg.GetEnv("JWT_SIGNING_KEY")
 
 	return &Auth{
 		jwtSecret: jwtSecret,

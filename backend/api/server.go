@@ -3,10 +3,9 @@ package api
 import (
 	"fmt"
 	"libam/database"
+	"libam/internal/pkg"
 	"libam/repository"
-	"log/slog"
 	"net/http"
-	"os"
 
 	"github.com/gin-gonic/gin"
 )
@@ -30,11 +29,7 @@ func NewServer() *http.Server {
 	r.POST("/signup", userHandler.create)
 	r.POST("/login", userHandler.login)
 
-	port := os.Getenv("PORT")
-	if port == "" {
-		slog.Error("PORT is not found in env variabls")
-		os.Exit(1)
-	}
+	port := pkg.GetEnv("PORT")
 
 	server := &http.Server{
 		Addr:    fmt.Sprintf(":%v", port),
