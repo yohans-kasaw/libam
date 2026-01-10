@@ -1,21 +1,12 @@
 ##
 @host = http://localhost:8080
 
-
 ### ping 
 GET /ping HTTP/1.1
 Host: {{host}}
 
-### health 
-GET /health HTTP/1.1
-Host: {{host}}
-
-### all users
-GET /user HTTP/1.1
-Host: {{host}}
-
 ### login 
-POST /login HTTP/1.1
+POST /auth/login HTTP/1.1
 Host: {{host}}
 
 {
@@ -23,14 +14,23 @@ Host: {{host}}
     "Password": "Password@123"
 }
 
-
-### creat user
+### create_user
 POST /signup HTTP/1.1
 Host: {{host}}
 
 {
     "Name": "Yohans Kasaw",
-    "Email": "Yohans6@gmail.com",
+    "Email": "Yohans8@gmail.com",
     "Password": "Password@123"
 }
 
+### health 
+GET /api/health HTTP/1.1
+Host: {{host}}
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5IiwiZXhwIjoxNzY4MTQ0NTEwLCJpYXQiOjE3NjgwNTgxMTB9.6xjA8lLygSxrmcKDGY_TuaI6Yy1NhA7bpFyHQxrm4ts
+
+### all users
+GET /api/user HTTP/1.1
+Host: {{host}}
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5IiwiZXhwIjoxNzY4MTQ0NTEwLCJpYXQiOjE3NjgwNTgxMTB9.6xjA8lLygSxrmcKDGY_TuaI6Yy1NhA7bpFyHQxrm4ts

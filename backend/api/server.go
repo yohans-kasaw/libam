@@ -18,16 +18,25 @@ func NewServer() *http.Server {
 	s := &Api{}
 
 	r := gin.Default()
+	auth := NewAuth()
 
 	userRepository := repository.NewGormRepository[database.User](db)
 	userHandler := NewUserHandler(&userRepository)
 
 	r.GET("/ping", s.ping)
-	r.GET("/health", s.health)
-	r.GET("/user", userHandler.list)
 
-	r.POST("/signup", userHandler.create)
-	r.POST("/login", userHandler.login)
+
+	authGroup := r.Group("/auth")
+	{
+		authGroup.POST("/signup", userHandler.create)
+		authGroup.POST("/login", userHandler.login)
+	}
+
+	protected := r.Group("/api")
+	{
+		protected.GET("/health", auth.authMiddleWare(), s.health)
+		protected.GET("/user", auth.authMiddleWare(), userHandler.list)
+	}
 
 	port := pkg.GetEnv("PORT")
 
