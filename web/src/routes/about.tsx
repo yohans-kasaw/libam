@@ -1,10 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
-import ky from "ky";
+import { useQuery } from '@tanstack/react-query'
+import { createFileRoute } from '@tanstack/react-router'
+import apiService from '../api/clients'
 
-interface Response {
-    status: string,
-    method: string,
+interface Health {
+    idle: number
+    status: string
 }
 
 export const Route = createFileRoute('/about')({
@@ -13,24 +13,19 @@ export const Route = createFileRoute('/about')({
 
 function About() {
     const { data, isLoading } = useQuery({
-        queryKey: ["dummyJson"],
-        queryFn: (): Promise<Response> => {
-            return ky.get("https://dummyjson.com/test").json()
-        }
+        queryKey: ['health'],
+        queryFn: (): Promise<Health> => {
+            return apiService.get('health', {}).json()
+        },
     })
     return (
         <div>
             Hello from "About"
             <br />
-            {isLoading && "loadig .."}
-            {
-                data?.status
-            }
+            {isLoading && 'loadig ..'}
+            {data?.status}
             <br />
-            {
-                data?.method
-            }
+            {data?.idle}
         </div>
     )
-
 }

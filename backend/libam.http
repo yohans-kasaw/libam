@@ -1,11 +1,11 @@
 ##
 @host = http://localhost:8080
 
-### ping 
+### ping
 GET /ping HTTP/1.1
 Host: {{host}}
 
-### login 
+### login
 POST /auth/login HTTP/1.1
 Host: {{host}}
 
@@ -24,13 +24,13 @@ Host: {{host}}
     "Password": "Password@123"
 }
 
-### health 
+### health
 GET /api/health HTTP/1.1
 Host: {{host}}
 Accept: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5IiwiZXhwIjoxNzY4MTQ0NTEwLCJpYXQiOjE3NjgwNTgxMTB9.6xjA8lLygSxrmcKDGY_TuaI6Yy1NhA7bpFyHQxrm4ts
+Authorization: Bearer {{login.response.body.access_token}}
 
 ### all users
 GET /api/user HTTP/1.1
 Host: {{host}}
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5IiwiZXhwIjoxNzY4MTQ0NTEwLCJpYXQiOjE3NjgwNTgxMTB9.6xjA8lLygSxrmcKDGY_TuaI6Yy1NhA7bpFyHQxrm4ts
+Authorization: Bearer {{login.response.body.access_token}}
