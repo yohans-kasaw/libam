@@ -4,7 +4,7 @@ import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 function RootComponent() {
     return (
         <>
-            <div>Hello "__root"!</div>
+            <div className="underline">Hello "__root"!</div>
             <div>
                 <Link to="/">home</Link>
             </div>

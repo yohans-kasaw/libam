@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import apiService from '../api/clients'
+import apiService from '@/api/clients'
 
 interface Health {
     idle: number
