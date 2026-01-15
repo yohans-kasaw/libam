@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import apiService from '@/api/clients'
+import { Button } from '@/components/ui/button'
 
 interface Health {
     idle: number
@@ -26,6 +27,8 @@ function About() {
             {data?.status}
             <br />
             {data?.idle}
+            <br />
+            <Button> from shadcn </Button>
         </div>
     )
 }
