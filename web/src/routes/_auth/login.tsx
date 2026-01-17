@@ -1,10 +1,11 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
+import SocialButtons from '@/components/SocialButtons'
 
 export const Route = createFileRoute('/_auth/login')({
     beforeLoad() {
         if (authenticated()) {
             throw redirect({
-                to: "/",
+                to: '/',
                 replace: true,
             })
         }
@@ -13,7 +14,7 @@ export const Route = createFileRoute('/_auth/login')({
 })
 
 function RouteComponent() {
-    return <div>Hello "/auth/login"!</div>
+    return <SocialButtons/>
 }
 
 //TODO: implement
