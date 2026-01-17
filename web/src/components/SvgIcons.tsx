@@ -70,7 +70,6 @@ export const InstagramIcon = (props: JSX.IntrinsicElements['svg']) => (
         viewBox="0 0 24 24"
         className="w-6 h-6"
         fill="none"
-        stroke-width="2"
         stroke="currentColor"
         {...props}
     >
