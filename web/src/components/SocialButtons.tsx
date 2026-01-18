@@ -33,7 +33,7 @@ const socialPlatforms = [
 
 export default function SocialButtons() {
     return (
-        <div className="flex justify-center gap-4">
+        <div className="flex justify-center gap-3">
             {socialPlatforms.map((platform) => (
                 <Button
                     className="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ease-out hover:scale-110"
