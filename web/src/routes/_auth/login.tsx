@@ -1,12 +1,8 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import { Mail, Phone } from 'lucide-react'
 import SocialButtons from '@/components/SocialButtons'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
+import LoginForm, { type LoginMethod } from '@/components/LoginForm'
 import { Separator } from '@/components/ui/separator'
-import { useState, type FormEvent } from 'react'
-import { Tabs, TabsContent, TabsTrigger, TabsList } from '@/components/ui/tabs'
-import { Card, CardAction, CardContent, CardHeader } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export const Route = createFileRoute('/_auth/login')({
     beforeLoad() {
@@ -21,80 +17,40 @@ export const Route = createFileRoute('/_auth/login')({
 })
 
 function RouteComponent() {
-    type emailOrPhone = 'email' | 'phone'
-    const [activeTab, setActiveTab] = useState<emailOrPhone>('email')
-    const [input, setInput] = useState('')
-
-    const handleSendOtp = (e: FormEvent) => {
-        e.preventDefault()
-
-        console.log('Using email or phone', activeTab)
-        console.log('Submitting:', input)
-        // api.sendOtp({ [activeTab]: input })
+    const handleSendOtp = (method: LoginMethod, value: string) => {
+        console.log('Using login method:', method)
+        console.log('Submitting identity:', value)
+        // api.sendOtp({ [method]: value })
     }
 
     return (
-        <div className="flex justify-center mb-20">
-            <Card className="w-full max-w-sm">
-                {/* Tab Switcher */}
-                <form onSubmit={handleSendOtp}>
-                    <CardContent>
-                        <Tabs
-                            defaultValue="phone"
-                            onValueChange={(value) => {
-                                setActiveTab(value as emailOrPhone)
-                                setInput('')
-                            }}
-                        >
-                            <TabsList className="w-full mb-8">
-                                <TabsTrigger value="phone">
-                                    <Phone />
-                                    Phone
-                                </TabsTrigger>
-                                <TabsTrigger value="email">
-                                    <Mail />
-                                    Email
-                                </TabsTrigger>
-                            </TabsList>
-                            <TabsContent value="phone" className="mb-4">
-                                <Input
-                                    type="tel"
-                                    name="phone"
-                                    autoComplete="tel"
-                                    value={input}
-                                    onChange={(e) => setInput(e.target.value)}
-                                    placeholder="Enter your phone number"
-                                />
-                            </TabsContent>
+        <div className="flex justify-center">
+            <Card className="w-full max-w-sm shadow-lg border-muted/20">
+                <CardHeader className="space-y-1">
+                    <CardTitle className="text-2xl font-bold tracking-tight">
+                        Sign in
+                    </CardTitle>
+                    <CardDescription>
+                        Choose your preferred method to receive a secure login code and access your account.
+                    </CardDescription>
+                </CardHeader>
 
-                            <TabsContent value="email" className="mb-4">
-                                <Input
-                                    type="email"
-                                    name="email"
-                                    autoComplete="email"
-                                    value={input}
-                                    onChange={(e) => setInput(e.target.value)}
-                                    placeholder="Enter your email"
-                                />
-                            </TabsContent>
-                        </Tabs>
+                <CardContent className="grid gap-4">
+                    <LoginForm onSendOtp={handleSendOtp} />
 
-                        <Button type="submit" className="w-full">
-                            Send OTP
-                        </Button>
-                    </CardContent>
-                </form>
+                    <div className="relative">
+                        <div className="absolute inset-0 flex items-center">
+                            <Separator className="w-full" />
+                        </div>
+                        <div className="relative flex justify-center text-xs uppercase">
+                            <span className="bg-background px-2 text-muted-foreground">
+                                Or continue with
+                            </span>
+                        </div>
+                    </div>
 
-                {/* Divider */}
-                <div className="flex items-center gap-4">
-                    <Separator className="flex-1" />
-                    <span className="text-muted-foreground text-sm font-medium">
-                        or
-                    </span>
-                    <Separator className="flex-1" />
-                </div>
-
-                <SocialButtons />
+                    <SocialButtons />
+                </CardContent>
             </Card>
         </div>
     )
