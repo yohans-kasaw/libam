@@ -1,6 +1,8 @@
 import { createRootRoute, Outlet } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { Toaster } from '@/components/ui/sonner'
+
 
 function RootComponent() {
     return (
@@ -9,6 +11,7 @@ function RootComponent() {
                 <ThemeToggle />
             </div>
             <Outlet></Outlet>
+            <Toaster position='top-center'/>
             <TanStackRouterDevtools />
         </>
     )

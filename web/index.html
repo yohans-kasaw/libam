@@ -1,13 +1,47 @@
 <!doctype html>
 <html lang="en" class="dark">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>web</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>web</title>
+
+        <!-- 🛑 PREVENT FLASH SCRIPT -->
+        <script>
+            ;(function () {
+                // 1. Defined the key (must match Zustand's persist name)
+                var THEME_STORAGE_KEY = 'ui-theme-mode'
+
+                function getTheme() {
+                    try {
+                        var persisted = localStorage.getItem(THEME_STORAGE_KEY)
+                        if (persisted) {
+                            // Zustand stores data like: { state: { theme: 'dark' }, version: 0 }
+                            return JSON.parse(persisted).state.theme
+                        }
+                    } catch (e) {}
+                    return 'system'
+                }
+
+                var theme = getTheme()
+                var element = document.documentElement
+                element.classList.remove('dark', 'light')
+
+                if (theme === 'system') {
+                    var isDark = window.matchMedia(
+                        '(prefers-color-scheme: dark)',
+                    ).matches
+                    theme = isDark ? 'dark' : 'light'
+                }
+                console.log(theme)
+                element.classList.add(theme)
+                console.log(element.classList)
+            })()
+        </script>
+        <!-- END SCRIPT -->
+    </head>
+    <body>
+        <div id="root"></div>
+        <script type="module" src="/src/main.tsx"></script>
+    </body>
 </html>

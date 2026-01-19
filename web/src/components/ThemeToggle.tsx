@@ -1,9 +1,9 @@
-import { useTheme } from '@/hooks/useTheme'
+import { useThemeStore } from '@/store/themeStore'
 import { Sun, Moon, Monitor } from 'lucide-react'
 import { capitalize, cn } from '@/lib/utils'
 
 export function ThemeToggle() {
-    const { theme, setTheme } = useTheme()
+    const themeStore = useThemeStore()
 
     const modes = [
         { name: 'light', icon: Sun },
@@ -15,12 +15,12 @@ export function ThemeToggle() {
         <div className="w-fit px-2 p-1 flex gap-2 rounded-full bg-background/60 shadow-lg transition-all duration-300 hover:shadow-primary/5">
             {modes.map((mode) => {
                 const Icon = mode.icon
-                const isActive = theme === mode.name
+                const isActive = themeStore.theme === mode.name
 
                 return (
                     <button
                         key={mode.name}
-                        onClick={() => setTheme(mode.name)}
+                        onClick={() => themeStore.setTheme(mode.name)}
                         className={cn(
                             'flex h-8 w-8 items-center justify-center rounded-full transition-all duration-300',
                             isActive

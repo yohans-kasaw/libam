@@ -1,12 +1,21 @@
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
+import { toast } from 'sonner'
 import SocialButtons from '@/components/SocialButtons'
 import LoginForm, { type LoginMethod } from '@/components/LoginForm'
 import { Separator } from '@/components/ui/separator'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card'
+import { useAuthStore } from '@/store/authStore'
 
 export const Route = createFileRoute('/_auth/login')({
     beforeLoad() {
-        if (authenticated()) {
+        const { isAuthenticated } = useAuthStore.getState()
+        if (isAuthenticated) {
             throw redirect({
                 to: '/',
                 replace: true,
@@ -17,10 +26,31 @@ export const Route = createFileRoute('/_auth/login')({
 })
 
 function RouteComponent() {
+    const authStoreState = useAuthStore()
+
+    const router = useRouter()
+
     const handleSendOtp = (method: LoginMethod, value: string) => {
-        console.log('Using login method:', method)
-        console.log('Submitting identity:', value)
-        // api.sendOtp({ [method]: value })
+        toast.promise(
+            async () => {
+                // Simulate a real API call delay
+                await new Promise((r) => setTimeout(() => {
+                    authStoreState.login('placeholder-token')
+                    r(true)
+                }, 1500))
+
+                //TODO: what the hell is this
+                await router.invalidate()
+
+                await router.navigate({ to: '/home' })
+                return 'Login successful'
+            },
+            {
+                loading: 'Sending OTP...',
+                success: 'OTP sent! Redirecting...',
+                error: 'Failed to send OTP',
+            },
+        )
     }
 
     return (
@@ -31,7 +61,8 @@ function RouteComponent() {
                         Sign in
                     </CardTitle>
                     <CardDescription>
-                        Choose your preferred method to receive a secure login code and access your account.
+                        Choose your preferred method to receive a secure login
+                        code and access your account.
                     </CardDescription>
                 </CardHeader>
 
@@ -54,9 +85,4 @@ function RouteComponent() {
             </Card>
         </div>
     )
-}
-
-//TODO: implement
-function authenticated() {
-    return false
 }

@@ -4,7 +4,6 @@ import { routeTree } from '@/routeTree.gen'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import './index.css'
-import ThemeProvider from '@/components/ThemeProvider'
 
 // adds type safty for <Links>
 declare module '@tanstack/react-router' {
@@ -34,16 +33,14 @@ export default function App() {
     }, [])
 
     return (
-        <ThemeProvider>
-            <QueryClientProvider client={queryClient}>
-                <RouterProvider router={router} />
-                <ReactQueryDevtools />
-                {showDevTools && (
-                    <Suspense fallback={null}>
-                        <ReactQueryDevtoolsProduction />
-                    </Suspense>
-                )}
-            </QueryClientProvider>
-        </ThemeProvider>
+        <QueryClientProvider client={queryClient}>
+            <RouterProvider router={router} />
+            <ReactQueryDevtools />
+            {showDevTools && (
+                <Suspense fallback={null}>
+                    <ReactQueryDevtoolsProduction />
+                </Suspense>
+            )}
+        </QueryClientProvider>
     )
 }
