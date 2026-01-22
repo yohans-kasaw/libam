@@ -11,34 +11,30 @@ export function ThemeToggle() {
         { name: 'system', icon: Monitor },
     ] as const
 
-    return (
-        <div className="w-fit px-2 p-1 flex gap-2 rounded-full bg-background/60 shadow-lg transition-all duration-300 hover:shadow-primary/5">
-            {modes.map((mode) => {
-                const Icon = mode.icon
-                const isActive = themeStore.theme === mode.name
+    const currentMode =
+        modes.find((mode) => mode.name === themeStore.theme) || modes[0]
+    const Icon = currentMode.icon
 
-                return (
-                    <button
-                        key={mode.name}
-                        onClick={() => themeStore.setTheme(mode.name)}
-                        className={cn(
-                            'flex h-8 w-8 items-center justify-center rounded-full transition-all duration-300',
-                            isActive
-                                ? 'bg-primary text-primary-foreground shadow-sm'
-                                : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-                        )}
-                        title={capitalize(mode.name)}
-                    >
-                        <Icon
-                            size={16}
-                            className="transition-transform duration-300 hover:scale-110"
-                        />
-                        {isActive && (
-                            <span className="absolute inset-0 rounded-full border border-primary/20 animate-ping opacity-20 pointer-events-none" />
-                        )}
-                    </button>
-                )
-            })}
-        </div>
+    const cycleTheme = () => {
+        const currentIndex = modes.findIndex(
+            (mode) => mode.name === themeStore.theme,
+        )
+        const nextIndex = (currentIndex + 1) % modes.length
+        themeStore.setTheme(modes[nextIndex].name)
+    }
+
+    return (
+        <button
+            onClick={cycleTheme}
+            className={cn('flex h-9 w-9 items-center justify-center rounded-full border bg-background shadow-sm transition-all duration-300 hover:bg-accent hover:text-accent-foreground hover:shadow-md')}
+            title={`Current: ${capitalize(currentMode.name)}. Click to cycle.`}
+        >
+            <Icon
+                size={16}
+                key={currentMode.name}
+                className="transition-transform duration-300 animate-in zoom-in-50"
+            />
+            <span className="sr-only">Toggle theme</span>
+        </button>
     )
 }

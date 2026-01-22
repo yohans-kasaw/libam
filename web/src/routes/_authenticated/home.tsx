@@ -13,7 +13,7 @@ function RouteComponent() {
     const router = useRouter()
 
     return (
-        <div className="p-8">
+        <div>
             <h1 className="text-2xl font-bold mb-4">Welcome Home</h1>
             <p className="mb-8">Hello "/_authenticated/home"!</p>
             <Button variant="outline" onClick={() => {
