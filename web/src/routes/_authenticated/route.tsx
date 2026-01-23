@@ -21,13 +21,13 @@ function RouteComponent() {
     return (
         <SidebarProvider>
             <AppSidebar />
-            <div className="pl-8">
+            <div className="pl-8 w-full">
                 <div>
                     <SidebarTrigger />
                 </div>
-                <main>
+                <div>
                     <Outlet></Outlet>
-                </main>
+                </div>
             </div>
         </SidebarProvider>
     )
