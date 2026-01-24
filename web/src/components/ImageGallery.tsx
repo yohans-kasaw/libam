@@ -7,7 +7,9 @@ import {
     CarouselNext,
     CarouselPrevious,
 } from '@/components/ui/carousel'
+import { Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { Button } from './ui/button'
 
 interface ImageGalleryProps {
     images: string[]
@@ -39,7 +41,7 @@ export function ImageGallery({ images }: ImageGalleryProps) {
 
     return (
         <Carousel opts={{ loop: true }} setApi={setApi} className="w-full">
-            <div className='flex justify-center text-xs/4 mb-2 text-muted-foreground'>
+            <div className="flex justify-center text-xs/4 mb-2 text-muted-foreground">
                 {current} / {count}
             </div>
             <CarouselContent>
@@ -58,9 +60,21 @@ export function ImageGallery({ images }: ImageGalleryProps) {
                     </CarouselItem>
                 ))}
             </CarouselContent>
-            <div className="flex justify-end gap-2 mt-4">
-                <CarouselPrevious className="static translate-y-0" />
-                <CarouselNext className="static translate-y-0" />
+
+            <div className="flex justify-between items-center mt-4">
+                <div className="flex gap-2 text-muted-foreground">
+                    <CarouselPrevious className="static translate-y-0 " />
+                    <CarouselNext className="static translate-y-0" />
+                </div>
+                <div>
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        className="rounded-full"
+                    >
+                        <Plus className="text-muted-foreground" />
+                    </Button>
+                </div>
             </div>
         </Carousel>
     )
