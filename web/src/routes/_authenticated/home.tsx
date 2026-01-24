@@ -1,4 +1,4 @@
-import { createFileRoute, useRouter } from '@tanstack/react-router'
+import { createFileRoute, Outlet, useRouter } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { useAuthStore } from '@/store/authStore'
 import { toast } from 'sonner'
@@ -33,6 +33,7 @@ function RouteComponent() {
             }}>
                 Logout
             </Button>
+            <Outlet></Outlet>
         </div>
     )
 }

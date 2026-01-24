@@ -1,5 +1,5 @@
 import { ThemeToggle } from '@/components/ThemeToggle'
-import { Route as ProfileRoute } from '@/routes/_authenticated/profile'
+import { Route as ProfileRoute } from '@/routes/_authenticated/home.profile'
 import { Link } from '@tanstack/react-router'
 import { type FileRoutesByFullPath } from '@/routeTree.gen'
 import {
@@ -53,7 +53,7 @@ export function AppSidebar() {
                 {items.map((item) => (
                     <SidebarMenuItem key={item.label}>
                         <SidebarMenuButton asChild>
-                            <Link href={item.to}>
+                            <Link to={item.to}>
                                 <item.icon />
                                 <span>{item.label}</span>
                             </Link>
