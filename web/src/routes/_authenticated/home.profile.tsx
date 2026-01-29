@@ -1,11 +1,15 @@
 import { ImageGallery } from '@/components/ImageGallery'
+import { Card, CardContent } from '@/components/ui/card'
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog'
 import { Route as Root } from '@/routes/index'
-import { DialogHeader } from '@/components/ui/dialog'
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useState, type ReactNode } from 'react'
 import { ChevronRight, CircleCheck, Hash, Mail, Phone } from 'lucide-react'
-import { Card, CardContent, CardTitle } from '@/components/ui/card'
+import { useState, type ReactNode } from 'react'
 
 export const Route = createFileRoute('/_authenticated/home/profile')({
     component: RouteComponent,
@@ -37,19 +41,19 @@ function RouteComponent() {
                     navigate({ to: Root.fullPath })
                 }}
             >
-                <DialogContent className='max-h-[90vh] overflow-y-auto'>
+                <DialogContent className="max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>Edit profile</DialogTitle>
                     </DialogHeader>
-                    <ImageGallery images={images} />
+                    <ImageGallery images={images} showAddButton={true} ratio={16/9} />
 
                     <div className="flex items-center gap-2 mt-4">
                         <div className="text-xl font-medium">
                             {profile.name}
                         </div>
-                        <div className='text-xl font-medium'>{profile.age}</div>
-                        <div className='flex justify-center items-center w-5 h-10'>
-                            <CircleCheck size={14} className='text-blue-300'/>
+                        <div className="text-xl font-medium">{profile.age}</div>
+                        <div className="flex justify-center items-center w-5 h-10">
+                            <CircleCheck size={14} className="text-blue-300" />
                         </div>
                     </div>
 
@@ -90,18 +94,17 @@ function RouteComponent() {
                         Bio
                     </h2>
                     {/* Bio */}
-                    <Card className='p-1'>
+                    <Card className="p-1">
                         <CardContent className="pl-4">
                             <div className="">
                                 <ActionItem
                                     title={profile.bio}
                                     description="Tap to change"
-                                    noChevron = {true}
+                                    noChevron={true}
                                 />
                             </div>
                         </CardContent>
                     </Card>
-
                 </DialogContent>
             </Dialog>
         </div>
@@ -135,10 +138,7 @@ function ActionItem({
                         {description}
                     </span>
                 </div>
-                {
-                    !noChevron &&
-                    <ChevronRight />
-                }
+                {!noChevron && <ChevronRight />}
             </div>
         </div>
     )
