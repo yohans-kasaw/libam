@@ -11,6 +11,7 @@ import {
     CardTitle,
 } from '@/components/ui/card'
 import { useAuthStore } from '@/store/authStore'
+import { BorderBeam } from '@/components/ui/border-beam'
 
 export const Route = createFileRoute('/_auth/login')({
     beforeLoad() {
@@ -34,10 +35,12 @@ function RouteComponent() {
         toast.promise(
             async () => {
                 // Simulate a real API call delay
-                await new Promise((r) => setTimeout(() => {
-                    authStoreState.login('placeholder-token')
-                    r(true)
-                }, 1500))
+                await new Promise((r) =>
+                    setTimeout(() => {
+                        authStoreState.login('placeholder-token')
+                        r(true)
+                    }, 1500),
+                )
 
                 //TODO: what the hell is this
                 await router.invalidate()
@@ -55,7 +58,7 @@ function RouteComponent() {
 
     return (
         <div className="flex justify-center">
-            <Card className="w-full max-w-sm shadow-lg border-muted/20">
+            <Card className="relative w-full max-w-sm shadow-lg border-muted/20">
                 <CardHeader className="space-y-1">
                     <CardTitle className="text-2xl font-bold tracking-tight">
                         Sign in
@@ -82,6 +85,11 @@ function RouteComponent() {
 
                     <SocialButtons />
                 </CardContent>
+                <BorderBeam
+                    duration={50}
+                    size={500}
+                    className="from-transparent via-foreground/60 to-transparent"
+                ></BorderBeam>
             </Card>
         </div>
     )
