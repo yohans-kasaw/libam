@@ -7,17 +7,21 @@ import { type UserProfile } from '@/types/user'
 export function PeopleCard({ userProfile }: { userProfile: UserProfile }) {
     return (
         <Card className="rounded-3xl p-4 pb-8">
-            <ImageGallery
-                images={userProfile.images}
-                showAddButton={false}
-                aspectRatio={9 / 16}
-            ></ImageGallery>
+            <div
+                onPointerDownCapture={(e) => {
+                    e.stopPropagation()
+                }}
+            >
+                <ImageGallery
+                    images={userProfile.images}
+                    showAddButton={false}
+                    aspectRatio={9 / 16}
+                ></ImageGallery>
+            </div>
 
             <div>
                 <div className="flex items-baseline gap-2 mb-1">
-                    <h2 className="text-2xl font-bold">
-                        {userProfile.name}
-                    </h2>
+                    <h2 className="text-2xl font-bold">{userProfile.name}</h2>
                     <span className="text-xl">{userProfile.age}</span>
                 </div>
 

@@ -20,7 +20,7 @@ function RouteComponent() {
         (_, index) => `https://picsum.photos/800/300?random=${index}`,
     )
 
-    const [profile, setProfile] = useState({
+    const [profile ] = useState({
         name: 'Yohans',
         age: 25,
         verified: true,
