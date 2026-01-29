@@ -50,7 +50,7 @@ export function ImageGallery({
             </div>
             <CarouselContent>
                 {images.map((image, index) => (
-                    <CarouselItem key={image} className="basis-2/3">
+                    <CarouselItem key={index} className="basis-2/3">
                         <AspectRatio
                             ratio={aspectRatio}
                             className={`transition-opacity duration-500 ease-in-out ${index === current ? 'opacity-100' : 'opacity-20'}`}

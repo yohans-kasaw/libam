@@ -1,7 +1,7 @@
 import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import SocialButtons from '@/components/SocialButtons'
-import LoginForm, { type LoginMethod } from '@/components/LoginForm'
+import LoginForm from '@/components/LoginForm'
 import { Separator } from '@/components/ui/separator'
 import {
     Card,
@@ -30,7 +30,7 @@ function RouteComponent() {
 
     const router = useRouter()
 
-    const handleSendOtp = (method: LoginMethod, value: string) => {
+    const handleSendOtp = () => {
         toast.promise(
             async () => {
                 // Simulate a real API call delay
