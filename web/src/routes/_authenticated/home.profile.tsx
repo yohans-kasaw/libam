@@ -45,7 +45,7 @@ function RouteComponent() {
                     <DialogHeader>
                         <DialogTitle>Edit profile</DialogTitle>
                     </DialogHeader>
-                    <ImageGallery images={images} showAddButton={true} ratio={16/9} />
+                    <ImageGallery images={images} showAddButton={true} aspectRatio={16/9} />
 
                     <div className="flex items-center gap-2 mt-4">
                         <div className="text-xl font-medium">

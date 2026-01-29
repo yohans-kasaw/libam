@@ -14,11 +14,11 @@ import { Button } from './ui/button'
 export function ImageGallery({
     images,
     showAddButton,
-    ratio,
+    aspectRatio,
 }: {
     images: string[]
     showAddButton?: boolean
-    ratio: number
+    aspectRatio: number
 }) {
     const [api, setApi] = useState<CarouselApi>()
     const [current, setCurrent] = useState(0)
@@ -50,9 +50,9 @@ export function ImageGallery({
             </div>
             <CarouselContent>
                 {images.map((image, index) => (
-                    <CarouselItem key={index} className="basis-2/3">
+                    <CarouselItem key={image} className="basis-2/3">
                         <AspectRatio
-                            ratio={ratio}
+                            ratio={aspectRatio}
                             className={`transition-opacity duration-500 ease-in-out ${index === current ? 'opacity-100' : 'opacity-20'}`}
                         >
                             <img
