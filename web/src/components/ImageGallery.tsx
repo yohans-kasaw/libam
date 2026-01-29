@@ -11,13 +11,17 @@ import { Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Button } from './ui/button'
 
-interface ImageGalleryProps {
+export function ImageGallery({
+    images,
+    showAddButton,
+    ratio,
+}: {
     images: string[]
-}
-
-export function ImageGallery({ images }: ImageGalleryProps) {
+    showAddButton?: boolean
+    ratio: number
+}) {
     const [api, setApi] = useState<CarouselApi>()
-    const [current, setCurrent] = useState(1)
+    const [current, setCurrent] = useState(0)
     const count = api?.scrollSnapList().length ?? 0
 
     useEffect(() => {
@@ -26,7 +30,7 @@ export function ImageGallery({ images }: ImageGalleryProps) {
         }
 
         const onSelect = () => {
-            setCurrent(api.selectedScrollSnap() + 1)
+            setCurrent(api.selectedScrollSnap())
         }
 
         api.on('select', onSelect)
@@ -42,14 +46,14 @@ export function ImageGallery({ images }: ImageGalleryProps) {
     return (
         <Carousel opts={{ loop: true }} setApi={setApi} className="w-full">
             <div className="flex justify-center text-xs/4 mb-2 text-muted-foreground">
-                {current} / {count}
+                {current + 1} / {count}
             </div>
             <CarouselContent>
                 {images.map((image, index) => (
                     <CarouselItem key={index} className="basis-2/3">
                         <AspectRatio
-                            ratio={16 / 9}
-                            className={`transition-opacity duration-500 ease-in-out ${index + 1 === current ? 'opacity-100' : 'opacity-20'}`}
+                            ratio={ratio}
+                            className={`transition-opacity duration-500 ease-in-out ${index === current ? 'opacity-100' : 'opacity-20'}`}
                         >
                             <img
                                 className="rounded-md w-full h-full object-cover"
@@ -66,15 +70,17 @@ export function ImageGallery({ images }: ImageGalleryProps) {
                     <CarouselPrevious className="static translate-y-0 " />
                     <CarouselNext className="static translate-y-0" />
                 </div>
-                <div>
-                    <Button
-                        variant="outline"
-                        size="icon"
-                        className="rounded-full"
-                    >
-                        <Plus className="text-muted-foreground" />
-                    </Button>
-                </div>
+                {showAddButton && (
+                    <div>
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            className="rounded-full"
+                        >
+                            <Plus className="text-muted-foreground" />
+                        </Button>
+                    </div>
+                )}
             </div>
         </Carousel>
     )
