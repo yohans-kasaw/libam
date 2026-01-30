@@ -10,48 +10,9 @@ import { useState } from 'react'
 import { EmptyFeed } from './EmptyFeed'
 import { PeopleCard } from './PeopleCard'
 import { Button } from './ui/button'
+import { MOCK_PROFILES } from '@/constants/mockData'
 
 export function DiscoveryFeed() {
-    let MOCK_PEOPLE = [
-        {
-            id: 1,
-            name: 'Sofia',
-            age: 28,
-            bio: 'Adventure seeker & coffee enthusiast ☕ Love hiking, photography, and spontaneous road trips.',
-            location: 'San Francisco, CA',
-            occupation: 'Product Designer',
-            images: Array.from({ length: 10 }).map(
-                (_, index) => `https://picsum.photos/800/300?random=${index}`,
-            ),
-        },
-        {
-            id: 2,
-            name: 'Marcus',
-            age: 31,
-            bio: 'Music producer by day, chef by night 🎵🍳 Dog dad to a golden retriever named Max.',
-            location: 'Los Angeles, CA',
-            occupation: 'Music Producer',
-            images: Array.from({ length: 10 }).map(
-                (_, index) => `https://picsum.photos/800/300?random=${index}`,
-            ),
-        },
-        {
-            id: 3,
-            name: 'Emma',
-            age: 26,
-            bio: 'Yoga instructor & plant mom 🌱 Believes in good vibes, green smoothies, and deep conversations.',
-            location: 'Austin, TX',
-            occupation: 'Yoga Instructor',
-            images: Array.from({ length: 10 }).map(
-                () => 'https://picsum.photos/800/300=${index}',
-            ),
-        },
-    ]
-    MOCK_PEOPLE = [...MOCK_PEOPLE]
-    // MOCK_PEOPLE = [...MOCK_PEOPLE, ...MOCK_PEOPLE, ...MOCK_PEOPLE]
-    // MOCK_PEOPLE = [...MOCK_PEOPLE, ...MOCK_PEOPLE, ...MOCK_PEOPLE]
-    // MOCK_PEOPLE = [...MOCK_PEOPLE, ...MOCK_PEOPLE, ...MOCK_PEOPLE]
-
     const [index, setIndex] = useState(0)
 
     const x = useMotionValue(0)
@@ -77,7 +38,7 @@ export function DiscoveryFeed() {
         <div className="flex justify-center">
             <div className="max-w-sm">
                 <AnimatePresence mode="wait">
-                    {index < MOCK_PEOPLE.length ? (
+                    {index < MOCK_PROFILES.length ? (
                         <motion.div
                             key={index}
                             initial={{
@@ -106,11 +67,9 @@ export function DiscoveryFeed() {
                             }}
                         >
                             <PeopleCard
-                                userProfile={{
-                                    ...MOCK_PEOPLE[index],
-                                    images: MOCK_PEOPLE[index].images,
-                                }}
+                                userProfile={MOCK_PROFILES[index]}
                             />
+
                         </motion.div>
                     ) : (
                         <motion.div

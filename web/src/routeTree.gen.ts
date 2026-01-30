@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AuthenticatedHomeProfileRouteImport } from './routes/_authenticated/home.profile'
+import { Route as AuthenticatedHomeMatchesRouteImport } from './routes/_authenticated/home.matches'
 
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
@@ -46,12 +47,19 @@ const AuthenticatedHomeProfileRoute =
     path: '/profile',
     getParentRoute: () => AuthenticatedHomeRoute,
   } as any)
+const AuthenticatedHomeMatchesRoute =
+  AuthenticatedHomeMatchesRouteImport.update({
+    id: '/matches',
+    path: '/matches',
+    getParentRoute: () => AuthenticatedHomeRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/login': typeof AuthLoginRoute
   '/home': typeof AuthenticatedHomeRouteWithChildren
+  '/home/matches': typeof AuthenticatedHomeMatchesRoute
   '/home/profile': typeof AuthenticatedHomeProfileRoute
 }
 export interface FileRoutesByTo {
@@ -59,6 +67,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/login': typeof AuthLoginRoute
   '/home': typeof AuthenticatedHomeRouteWithChildren
+  '/home/matches': typeof AuthenticatedHomeMatchesRoute
   '/home/profile': typeof AuthenticatedHomeProfileRoute
 }
 export interface FileRoutesById {
@@ -68,13 +77,20 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/_auth/login': typeof AuthLoginRoute
   '/_authenticated/home': typeof AuthenticatedHomeRouteWithChildren
+  '/_authenticated/home/matches': typeof AuthenticatedHomeMatchesRoute
   '/_authenticated/home/profile': typeof AuthenticatedHomeProfileRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/login' | '/home' | '/home/profile'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/login'
+    | '/home'
+    | '/home/matches'
+    | '/home/profile'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/login' | '/home' | '/home/profile'
+  to: '/' | '/about' | '/login' | '/home' | '/home/matches' | '/home/profile'
   id:
     | '__root__'
     | '/'
@@ -82,6 +98,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/_auth/login'
     | '/_authenticated/home'
+    | '/_authenticated/home/matches'
     | '/_authenticated/home/profile'
   fileRoutesById: FileRoutesById
 }
@@ -136,14 +153,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHomeProfileRouteImport
       parentRoute: typeof AuthenticatedHomeRoute
     }
+    '/_authenticated/home/matches': {
+      id: '/_authenticated/home/matches'
+      path: '/matches'
+      fullPath: '/home/matches'
+      preLoaderRoute: typeof AuthenticatedHomeMatchesRouteImport
+      parentRoute: typeof AuthenticatedHomeRoute
+    }
   }
 }
 
 interface AuthenticatedHomeRouteChildren {
+  AuthenticatedHomeMatchesRoute: typeof AuthenticatedHomeMatchesRoute
   AuthenticatedHomeProfileRoute: typeof AuthenticatedHomeProfileRoute
 }
 
 const AuthenticatedHomeRouteChildren: AuthenticatedHomeRouteChildren = {
+  AuthenticatedHomeMatchesRoute: AuthenticatedHomeMatchesRoute,
   AuthenticatedHomeProfileRoute: AuthenticatedHomeProfileRoute,
 }
 
