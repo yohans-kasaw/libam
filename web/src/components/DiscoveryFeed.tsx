@@ -35,7 +35,7 @@ export function DiscoveryFeed() {
     }
 
     return (
-        <div className="flex justify-center">
+        <div className="flex justify-center items-center h-full">
             <div className="max-w-sm">
                 <AnimatePresence mode="wait">
                     {index < MOCK_PROFILES.length ? (

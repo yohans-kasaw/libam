@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { useAuthStore } from '@/store/authStore'
 import { toast } from 'sonner'
 import { LogOut } from 'lucide-react'
-import { DiscoveryFeed } from '@/components/DiscoveryFeed'
+import { DiscoveryFeed } from '../../components/DiscoveryFeed'
 
 export const Route = createFileRoute('/_authenticated/home')({
     component: RouteComponent,
@@ -29,7 +29,7 @@ function RouteComponent() {
     }
 
     return (
-        <div className="relative min-h-screen overflow-auto">
+        <div className="relative h-screen overflow-auto">
             {/* Floating Logout Button */}
             <div className="fixed top-4 right-4 z-50">
                 <Button
