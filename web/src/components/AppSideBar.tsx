@@ -1,6 +1,7 @@
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { Route as ProfileRoute } from '@/routes/_authenticated/home.profile'
 import { Route as MatchesRoute } from '@/routes/_authenticated/home.matches'
+import { Route as HelpRoute } from '@/routes/_authenticated/help'
 import { Link } from '@tanstack/react-router'
 import { type FileRoutesByFullPath } from '@/routeTree.gen'
 import {
@@ -30,7 +31,7 @@ export function AppSidebar() {
             { label: 'Profile', to: ProfileRoute.fullPath, icon: User },
             { label: 'Matches', to: MatchesRoute.fullPath, icon: Users },
             { label: 'Settings', to: '/', icon: Settings },
-            { label: 'Help', to: '/', icon: HelpCircle },
+            { label: 'Help', to: HelpRoute.fullPath, icon: HelpCircle },
         ]
 
     return (

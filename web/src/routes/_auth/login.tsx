@@ -57,7 +57,7 @@ function RouteComponent() {
     }
 
     return (
-        <div className="flex justify-center">
+        <div className="flex  justify-center items-center h-full">
             <Card className="relative w-full max-w-sm shadow-lg border-muted/20">
                 <CardHeader className="space-y-1">
                     <CardTitle className="text-2xl font-bold tracking-tight">
