@@ -31,12 +31,22 @@ function RouteComponent() {
 
     const router = useRouter()
 
-    const handleSendOtp = () => {
+    const handleLogin = (
+        method: 'email' | 'phone' | 'password',
+        value: string,
+        password?: string,
+    ) => {
+        const isPasswordLogin = method === 'password'
         toast.promise(
             async () => {
                 // Simulate a real API call delay
                 await new Promise((r) =>
                     setTimeout(() => {
+                        console.log('Logging in with:', {
+                            method,
+                            value,
+                            password,
+                        })
                         authStoreState.login('placeholder-token')
                         r(true)
                     }, 1500),
@@ -46,12 +56,16 @@ function RouteComponent() {
                 await router.invalidate()
 
                 await router.navigate({ to: '/home' })
-                return 'Login successful'
+                return isPasswordLogin
+                    ? 'Login successful'
+                    : 'OTP sent! Redirecting...'
             },
             {
-                loading: 'Sending OTP...',
-                success: 'OTP sent! Redirecting...',
-                error: 'Failed to send OTP',
+                loading: isPasswordLogin ? 'Logging in...' : 'Sending OTP...',
+                success: (data) => data,
+                error: isPasswordLogin
+                    ? 'Login failed'
+                    : 'Failed to send OTP',
             },
         )
     }
@@ -70,7 +84,7 @@ function RouteComponent() {
                 </CardHeader>
 
                 <CardContent className="grid gap-4">
-                    <LoginForm onSendOtp={handleSendOtp} />
+                    <LoginForm onSendOtp={handleLogin} />
 
                     <div className="relative">
                         <div className="absolute inset-0 flex items-center">
