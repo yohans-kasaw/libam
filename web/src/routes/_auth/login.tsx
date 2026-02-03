@@ -1,8 +1,6 @@
-import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
-import { toast } from 'sonner'
-import SocialButtons from '@/components/SocialButtons'
 import LoginForm from '@/components/LoginForm'
-import { Separator } from '@/components/ui/separator'
+import SocialButtons from '@/components/SocialButtons'
+import { BorderBeam } from '@/components/ui/border-beam'
 import {
     Card,
     CardContent,
@@ -10,13 +8,15 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card'
-import { useAuthStore } from '@/store/authStore'
-import { BorderBeam } from '@/components/ui/border-beam'
+import { Separator } from '@/components/ui/separator'
+import { getIsAuthenticated } from '@/store/authStore'
+import { createFileRoute, redirect } from '@tanstack/react-router'
+import { toast } from 'sonner'
+import { useLoginMutation } from '../../hooks/api/useAuth'
 
 export const Route = createFileRoute('/_auth/login')({
     beforeLoad() {
-        const { isAuthenticated } = useAuthStore.getState()
-        if (isAuthenticated) {
+        if (getIsAuthenticated()) {
             throw redirect({
                 to: '/',
                 replace: true,
@@ -27,47 +27,23 @@ export const Route = createFileRoute('/_auth/login')({
 })
 
 function RouteComponent() {
-    const authStoreState = useAuthStore()
-
-    const router = useRouter()
+    const { mutate: login } = useLoginMutation()
 
     const handleLogin = (
         method: 'email' | 'phone' | 'password',
-        value: string,
+        identifier: string,
         password?: string,
     ) => {
         const isPasswordLogin = method === 'password'
-        toast.promise(
-            async () => {
-                // Simulate a real API call delay
-                await new Promise((r) =>
-                    setTimeout(() => {
-                        console.log('Logging in with:', {
-                            method,
-                            value,
-                            password,
-                        })
-                        authStoreState.login('placeholder-token')
-                        r(true)
-                    }, 1500),
-                )
+        if (!isPasswordLogin) {
+            toast.error("This method has not been implemented")
+            return
+        }
 
-                //TODO: what the hell is this
-                await router.invalidate()
-
-                await router.navigate({ to: '/home' })
-                return isPasswordLogin
-                    ? 'Login successful'
-                    : 'OTP sent! Redirecting...'
-            },
-            {
-                loading: isPasswordLogin ? 'Logging in...' : 'Sending OTP...',
-                success: (data) => data,
-                error: isPasswordLogin
-                    ? 'Login failed'
-                    : 'Failed to send OTP',
-            },
-        )
+        login({
+            email: identifier,
+            password: password ?? "",
+        })
     }
 
     return (
@@ -84,7 +60,7 @@ function RouteComponent() {
                 </CardHeader>
 
                 <CardContent className="grid gap-4">
-                    <LoginForm onSendOtp={handleLogin} />
+                    <LoginForm handleLogin={handleLogin} />
 
                     <div className="relative">
                         <div className="absolute inset-0 flex items-center">

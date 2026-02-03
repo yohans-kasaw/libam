@@ -2,28 +2,31 @@ import { TOKEN_KEY } from '@/lib/constants'
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 
-type authStoreState = {
-    token: string | null
-    login: (token: string) => void
-    logout: () => void
-    isAuthenticated: boolean
+interface AuthStore {
+    access_token: string | null
+    setCredentials: (token: string) => void
+    clearCredentials: () => void
 }
 
-export const useAuthStore = create<authStoreState>()(
+export const useAuthStore = create<AuthStore>()(
     persist(
         (set) => ({
-            token: null,
-            isAuthenticated: false,
-            login: (token) => {
-                set({ token, isAuthenticated: true})
+            access_token: null,
+            setCredentials: (token) => {
+                set({ access_token: token })
             },
-            logout: () => {
-                set({ token: null, isAuthenticated: false })
+            clearCredentials: () => {
+                set({ access_token: null })
             },
         }),
         {
             name: TOKEN_KEY,
             storage: createJSONStorage(() => localStorage),
+            partialize: (state) => ({
+                access_token: state.access_token
+            })
         },
     ),
 )
+
+export const getIsAuthenticated = () => !!useAuthStore.getState().access_token;

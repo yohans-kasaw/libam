@@ -1,32 +1,15 @@
-import { createFileRoute, Outlet, useRouter } from '@tanstack/react-router'
+import { createFileRoute, Outlet } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
-import { useAuthStore } from '@/store/authStore'
-import { toast } from 'sonner'
 import { LogOut } from 'lucide-react'
 import { DiscoveryFeed } from '../../components/DiscoveryFeed'
+import { useLogout } from '@/hooks/api/useAuth'
 
 export const Route = createFileRoute('/_authenticated/home')({
     component: RouteComponent,
 })
 
 function RouteComponent() {
-    const authStoreState = useAuthStore()
-    const router = useRouter()
-
-    const handleLogout = () => {
-        toast.promise(
-            async () => {
-                await new Promise((r) => setTimeout(r, 1000))
-                authStoreState.logout()
-                await router.navigate({ to: '/login' })
-            },
-            {
-                loading: 'Logging out...',
-                success: 'Successfully logged out',
-                error: 'Failed to logout',
-            }
-        )
-    }
+    const { handleLogout } = useLogout()
 
     return (
         <div className="relative h-screen overflow-auto">
