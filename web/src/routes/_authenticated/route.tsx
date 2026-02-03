@@ -1,14 +1,13 @@
-import { createFileRoute, redirect, Outlet } from '@tanstack/react-router'
-import { useAuthStore } from '@/store/authStore'
+import { getIsAuthenticated } from '@/store/authStore'
+import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/AppSideBar'
-import {} from '@tanstack/react-router'
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
+import { } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_authenticated')({
     beforeLoad() {
-        const { isAuthenticated } = useAuthStore.getState()
-        if (!isAuthenticated) {
+        if (!getIsAuthenticated()) {
             throw redirect({
                 to: '/login',
             })

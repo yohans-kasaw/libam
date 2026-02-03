@@ -7,10 +7,10 @@ import { Tabs, TabsContent, TabsTrigger, TabsList } from '@/components/ui/tabs'
 export type LoginMethod = 'email' | 'phone' | 'password'
 
 interface LoginFormProps {
-    onSendOtp: (method: LoginMethod, value: string, password?: string) => void
+    handleLogin: (method: LoginMethod, value: string, password?: string) => void
 }
 
-export default function LoginForm({ onSendOtp }: LoginFormProps) {
+export default function LoginForm({ handleLogin }: LoginFormProps) {
     const [activeTab, setActiveTab] = useState<LoginMethod>('phone')
     const [input, setInput] = useState('')
     const [password, setPassword] = useState('')
@@ -18,7 +18,7 @@ export default function LoginForm({ onSendOtp }: LoginFormProps) {
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault()
-        onSendOtp(activeTab, input, password)
+        handleLogin(activeTab, input, password)
     }
 
     const resetForm = (method: LoginMethod) => {

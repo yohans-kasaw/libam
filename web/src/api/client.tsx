@@ -1,3 +1,4 @@
+import { useAuthStore } from '@/store/authStore';
 import ky from 'ky'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -11,7 +12,7 @@ const api = ky.create({
     hooks: {
         beforeRequest: [
             (request) => {
-                const token = localStorage.getItem('access_token')
+                const token = useAuthStore.getState().access_token
                 if (token) {
                     request.headers.set('Authorization', `Bearer ${token}`)
                 }
