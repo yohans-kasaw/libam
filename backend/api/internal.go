@@ -21,7 +21,7 @@ func (s *Api) health(ctx *gin.Context) {
 	stats["status"] = "okay"
 
 	dbStats := db.Stats()
-	stats["user id"] = ctx.Keys["Subject"]
+	stats["user_id"] = ctx.Keys["Subject"]
 	stats["open_connections"] = dbStats.OpenConnections
 	stats["in_use"] = dbStats.InUse
 	stats["idle"] = dbStats.Idle
