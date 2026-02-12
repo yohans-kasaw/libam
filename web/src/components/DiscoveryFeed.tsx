@@ -55,8 +55,15 @@ export function DiscoveryFeed() {
                 key={frontProfile.id}
                 className='row-start-1 col-start-1'
                 layout
-                // exit={{ scale: 0.8 }}
-                style={{ x, y, rotate, zIndex: stackSize }}
+                style={{
+                  x,
+                  y,
+                  rotate,
+                  zIndex: stackSize,
+                  // Pivot rotation closer to the bottom so the card
+                  // stays visually under the finger while swiping
+                  transformOrigin: '50% 80%',
+                }}
                 drag="x"
                 onDragEnd={handleDragEnd}
                 animate={controls}
