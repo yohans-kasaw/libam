@@ -21,8 +21,8 @@ interface UseSwipeCardOptions {
 
 const DEFAULT_SWIPE_DISTANCE = 120
 const DEFAULT_SWIPE_VELOCITY = 500
-const DEFAULT_MAX_ROTATION_DEG = 25
-const DEFAULT_Y_DRIFT = 10
+const DEFAULT_MAX_ROTATION_DEG = 15
+const DEFAULT_Y_DRIFT = 0
 
 const SPRING_TO_CENTER = {
     type: 'spring' as const,
