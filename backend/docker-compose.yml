@@ -1,9 +1,42 @@
+x-shared-env: &shared-env
+  environment:
+    GOOSE_MIGRATION_DIR: ${GOOSE_MIGRATION_DIR}
+    GOOSE_DRIVER: ${GOOSE_DRIVER}
+    PORT: ${PORT}
+    JWT_SIGNING_KEY: ${JWT_SIGNING_KEY}
+    GOOSE_DBSTRING: postgresql://postgres@libam-db/postgres?sslmode=disable
+    GIN_MODE: release
+
 services:
-  psql:
-    image: postgres:latest
+  migration:
+    build: .
+    image: libam-backend
+    command: ["./migrate", "up"]
+    <<: *shared-env
+    depends_on:
+      libam-db:
+        condition: service_healthy
+
+  libam-backend:
+    build: .
+    image: libam-backend
+    ports:
+      - "${PORT}:${PORT}"
+    <<: *shared-env
+    depends_on:
+      migration:
+        condition: service_completed_successfully
+
+  libam-db:
+    image: postgres:18
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
     volumes:
       - ${POSTGRES_DATA_DIR}:/var/lib/postgresql

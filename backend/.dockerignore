@@ -1,0 +1,9 @@
+tmp/
+.air.toml
+.env
+.gitignore
+build/
+Dockerfile
+Makefile
+docker-compose.yml
+libam.http

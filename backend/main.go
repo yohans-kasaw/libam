@@ -26,8 +26,7 @@ func main() {
 
 	err := godotenv.Load()
 	if err != nil {
-		slog.Error("Error loading .env file")
-		os.Exit(1)
+		slog.Warn("Error loading .env file")
 	}
 
 	server := api.NewServer()
