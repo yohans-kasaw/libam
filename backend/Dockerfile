@@ -6,17 +6,20 @@ RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o libam-api .
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o migrate ./cmd/migrate
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o libam-api . &&\
+    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o migrate ./cmd/migrate
 
-FROM alpine:3.19
+FROM alpine:3.23.3
 WORKDIR /app
 
-COPY --from=builder /app/libam-api .
-COPY --from=builder /app/migrate .
-COPY --from=builder /app/start.sh .
-EXPOSE 8080
+COPY --from=builder /app/libam-api /app/migrate /app/start.sh ./
 
-RUN chmod +x ./start.sh
+RUN addgroup -S appgroup && adduser -S appuser &&\
+    chown -R appuser:appgroup /app &&\
+    chmod +x ./start.sh
+
+USER appuser
+
+EXPOSE 8080
 
 CMD ["./start.sh"]

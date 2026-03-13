@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (s *Api) health(ctx *gin.Context) {
+func (s *Api) dbStat(ctx *gin.Context) {
 	db, _ := database.NewDatabase().Db.DB()
 	if err := db.Ping(); err != nil {
 		ctx.JSON(http.StatusServiceUnavailable, gin.H{

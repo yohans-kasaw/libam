@@ -1,8 +1,7 @@
 import apiService from './client'
 import type { HealthResponse } from '@/types/helpDto'
 
-export async function getHealth(): Promise<HealthResponse> {
-    await new Promise(resolve => setTimeout(resolve, 3000))
-    const res = await apiService.get('api/health', {})
+export async function getDbStat(): Promise<HealthResponse> {
+    const res = await apiService.get('api/db-stat', {})
     return res.json<HealthResponse>()
 }

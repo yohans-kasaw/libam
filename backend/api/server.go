@@ -33,7 +33,7 @@ func NewServer() *http.Server {
 	userRepository := repository.NewGormRepository[database.User](db)
 	userHandler := NewUserHandler(&userRepository)
 
-	r.GET("/ping", s.ping)
+	r.GET("/health", s.health)
 
 	authGroup := r.Group("/auth")
 	{
@@ -43,7 +43,7 @@ func NewServer() *http.Server {
 
 	protected := r.Group("/api")
 	{
-		protected.GET("/health", auth.authMiddleWare(), s.health)
+		protected.GET("/db-stat", auth.authMiddleWare(), s.dbStat)
 		protected.GET("/user", auth.authMiddleWare(), userHandler.list)
 	}
 

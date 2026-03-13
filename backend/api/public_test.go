@@ -12,9 +12,9 @@ func TestPing(t *testing.T) {
 	s := Api{}
 
 	r := gin.New()
-	r.GET("/ping", s.ping)
+	r.GET("/health", s.health)
 
-	req, err := http.NewRequest("GET", "/ping", nil)
+	req, err := http.NewRequest("GET", "/health", nil)
 	if err != nil {
 		t.Fatal(err)
 	}

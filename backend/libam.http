@@ -1,8 +1,8 @@
 ##
 @host = http://localhost:8080
 
-### ping
-GET /ping HTTP/1.1
+### health 
+GET /health HTTP/1.1
 Host: {{host}}
 
 ### login
@@ -24,8 +24,8 @@ Host: {{host}}
     "Password": "Password@123"
 }
 
-### health
-GET /api/health HTTP/1.1
+### db-stat 
+GET /api/db-stat HTTP/1.1
 Host: {{host}}
 Accept: application/json
 Authorization: Bearer {{login.response.body.access_token}}
