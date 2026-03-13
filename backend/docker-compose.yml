@@ -1,31 +1,19 @@
-x-shared-env: &shared-env
-  environment:
-    GOOSE_MIGRATION_DIR: ${GOOSE_MIGRATION_DIR}
-    GOOSE_DRIVER: ${GOOSE_DRIVER}
-    PORT: ${PORT}
-    JWT_SIGNING_KEY: ${JWT_SIGNING_KEY}
-    GOOSE_DBSTRING: postgresql://postgres@libam-db/postgres?sslmode=disable
-    GIN_MODE: release
-
 services:
-  migration:
-    build: .
-    image: libam-backend
-    command: ["./migrate", "up"]
-    <<: *shared-env
-    depends_on:
-      libam-db:
-        condition: service_healthy
-
   libam-backend:
     build: .
     image: libam-backend
     ports:
       - "${PORT}:${PORT}"
-    <<: *shared-env
+    environment:
+      GOOSE_MIGRATION_DIR: ${GOOSE_MIGRATION_DIR}
+      GOOSE_DRIVER: ${GOOSE_DRIVER}
+      PORT: ${PORT}
+      JWT_SIGNING_KEY: ${JWT_SIGNING_KEY}
+      GOOSE_DBSTRING: postgresql://postgres@libam-db/postgres?sslmode=disable
+      GIN_MODE: release
     depends_on:
-      migration:
-        condition: service_completed_successfully
+      libam-db:
+        condition: service_healthy
 
   libam-db:
     image: postgres:18

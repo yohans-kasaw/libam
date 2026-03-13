@@ -14,6 +14,9 @@ WORKDIR /app
 
 COPY --from=builder /app/libam-api .
 COPY --from=builder /app/migrate .
+COPY --from=builder /app/start.sh .
 EXPOSE 8080
 
-CMD ["./libam-api"]
+RUN chmod +x ./start.sh
+
+CMD ["./start.sh"]
