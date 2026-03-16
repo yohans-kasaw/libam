@@ -22,4 +22,6 @@ USER appuser
 
 EXPOSE 8080
 
+HEALTHCHECK --interval=10s --timeout=3s --retries=3 CMD wget --spider http://localhost:$PORT/health
+
 CMD ["./start.sh"]
