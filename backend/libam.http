@@ -15,12 +15,12 @@ Host: {{host}}
 }
 
 ### create_user
-POST /signup HTTP/1.1
+POST /auth/signup HTTP/1.1
 Host: {{host}}
 
 {
     "Name": "Yohans Kasaw",
-    "Email": "Yohans8@gmail.com",
+    "Email": "Yohans@gmail.com",
     "Password": "Password@123"
 }
 
