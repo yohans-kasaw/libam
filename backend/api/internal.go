@@ -5,10 +5,23 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
+func getDBAddress(db *gorm.DB) string {
+	var dbAddr string
+
+	err := db.Raw("SELECT inet_server_addr()").Scan(&dbAddr).Error
+
+	if err != nil || dbAddr == "" {
+		return "localhost/socket"
+	}
+	return dbAddr
+}
+
 func (s *Api) dbStat(ctx *gin.Context) {
-	db, _ := database.NewDatabase().Db.DB()
+	gdb := database.NewDatabase().Db
+	db, _ := gdb.DB()
 	if err := db.Ping(); err != nil {
 		ctx.JSON(http.StatusServiceUnavailable, gin.H{
 			"error": err.Error(),
@@ -19,6 +32,7 @@ func (s *Api) dbStat(ctx *gin.Context) {
 
 	stats := make(map[string]any)
 	stats["status"] = "okay"
+	stats["db_host"] = getDBAddress(gdb)
 
 	dbStats := db.Stats()
 	stats["user_id"] = ctx.Keys["Subject"]
