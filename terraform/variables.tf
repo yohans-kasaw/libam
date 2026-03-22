@@ -8,3 +8,13 @@ variable "region" {
   default = "me-west1"
 }
 
+variable "GOOSE_DBSTRING" {
+  type      = string
+  sensitive = true
+}
+
+variable "JWT_SIGNING_KEY" {
+  type      = string
+  sensitive = true
+}
+
