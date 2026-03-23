@@ -1,15 +1,34 @@
 package env
 
 import (
-	"github.com/joho/godotenv"
 	"log/slog"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 func init() {
-	err := godotenv.Load()
-	if err != nil {
-		slog.Warn("Error loading .env file")
+	paths := []string{"/secrets/.env", ".env"}
+	var loaded bool
+
+	for _, path := range paths {
+		// Check if file exists before trying to load
+		if _, err := os.Stat(path); os.IsNotExist(err) {
+			continue
+		}
+
+		if err := godotenv.Load(path); err != nil {
+			slog.Error("failed to load .env file", "path", path, "error", err)
+			os.Exit(1)
+		}
+
+		slog.Info("environment configuration loaded", "path", path)
+		loaded = true
+		break
+	}
+
+	if !loaded {
+		slog.Error("no .env file found in search paths", "searched", paths)
 		os.Exit(1)
 	}
 }

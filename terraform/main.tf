@@ -1,10 +1,7 @@
-# TODO bulding images in terraform is antipattern, it should be done on github actions
 # TODO have the front end deployed and connected to also. 
 # TODO have auth to access libam api 
+# TODO bulding images in terraform is antipattern, it should be done on github actions
 # TODO have cloud sql create here 
-# TODO find a way to have all variables in one instead of definig theme one by one 
-# TODO have tfvariables
-# TODO change to secrets, does it redeplay, check and improve.
 
 terraform {
   required_providers {
@@ -56,41 +53,21 @@ resource "google_service_account" "libam-api-cloud-run" {
   display_name = "Libam API Service Account"
 }
 
-resource "google_secret_manager_secret" "GOOSE_DBSTRING" {
-  secret_id = "GOOSE_DBSTRING"
+resource "google_secret_manager_secret" "app-env" {
+  secret_id = "app-env"
   replication {
     auto {
     }
   }
 }
 
-resource "google_secret_manager_secret_version" "GOOSE_DBSTRING" {
-  secret      = google_secret_manager_secret.GOOSE_DBSTRING.id
-  secret_data = var.GOOSE_DBSTRING
+resource "google_secret_manager_secret_version" "app-latest" {
+  secret      = google_secret_manager_secret.app-env.id
+  secret_data = file("${path.root}/../backend/.env.prod")
 }
 
-resource "google_secret_manager_secret_iam_member" "goose_secret_access" {
-  secret_id = google_secret_manager_secret.GOOSE_DBSTRING.id
-  role      = "roles/secretmanager.secretAccessor"
-  member    = "serviceAccount:${google_service_account.libam-api-cloud-run.email}"
-}
-
-
-resource "google_secret_manager_secret" "JWT_SIGNING_KEY" {
-  secret_id = "JWT_SIGNING_KEY"
-  replication {
-    auto {
-    }
-  }
-}
-
-resource "google_secret_manager_secret_version" "JWT_SIGNING_KEY" {
-  secret      = google_secret_manager_secret.JWT_SIGNING_KEY.id
-  secret_data = var.JWT_SIGNING_KEY
-}
-
-resource "google_secret_manager_secret_iam_member" "jwt_secret_access" {
-  secret_id = google_secret_manager_secret.JWT_SIGNING_KEY.id
+resource "google_secret_manager_secret_iam_member" "app-env-secret-access" {
+  secret_id = google_secret_manager_secret.app-env.id
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${google_service_account.libam-api-cloud-run.email}"
 }
@@ -113,34 +90,21 @@ resource "google_cloud_run_v2_service" "libam-api" {
         }
       }
 
-      env {
-        name = "GOOSE_DBSTRING"
-        value_source {
-          secret_key_ref {
-            secret  = google_secret_manager_secret.GOOSE_DBSTRING.secret_id
-            version = "latest"
-          }
+      volume_mounts {
+        name = "app-env-volume"
+        mount_path = "/secrets"
+      }
+    }
+
+    volumes {
+      name = "app-env-volume"
+      secret {
+        secret = google_secret_manager_secret.app-env.secret_id
+
+        items {
+          version = "latest"
+          path    = ".env"
         }
-      }
-
-      env {
-        name = "JWT_SIGNING_KEY"
-        value_source {
-          secret_key_ref {
-            secret  = google_secret_manager_secret.JWT_SIGNING_KEY.secret_id
-            version = "latest"
-          }
-        }
-      }
-
-      env {
-        name  = "GOOSE_MIGRATION_DIR"
-        value = "./migrations"
-      }
-
-      env {
-        name  = "GOOSE_DRIVER"
-        value = "postgres"
       }
     }
 
@@ -152,8 +116,7 @@ resource "google_cloud_run_v2_service" "libam-api" {
 
   depends_on = [
     docker_registry_image.publish-images,
-    google_secret_manager_secret_iam_member.jwt_secret_access,
-    google_secret_manager_secret_iam_member.goose_secret_access
+    google_secret_manager_secret_iam_member.app-env-secret-access,
   ]
 }
 

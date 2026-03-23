@@ -9,6 +9,7 @@ services:
         condition: service_healthy
     volumes:
       - ./.env:/app/.env
+      # - ./.env:/secrets/.env
     healthcheck:
       test: ["CMD-SHELL", "wget --spider http://localhost:${PORT}/health"]
       interval: 10s
