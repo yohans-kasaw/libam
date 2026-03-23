@@ -3,7 +3,7 @@ package api
 import (
 	"fmt"
 	"libam/database"
-	"libam/internal/pkg"
+	"libam/internal/env"
 	"libam/repository"
 	"net/http"
 
@@ -47,7 +47,7 @@ func NewServer() *http.Server {
 		protected.GET("/user", auth.authMiddleWare(), userHandler.list)
 	}
 
-	port := pkg.GetEnv("PORT")
+	port := env.GetEnv("PORT")
 
 	server := &http.Server{
 		Addr:    fmt.Sprintf(":%v", port),

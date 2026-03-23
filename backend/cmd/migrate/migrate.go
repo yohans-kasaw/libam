@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"os"
 
+	_ "libam/internal/env"
 	_ "libam/migrations"
 
 	"github.com/lmittmann/tint"
@@ -14,6 +15,7 @@ import (
 )
 
 func main() {
+
 	logger := slog.New(tint.NewHandler(os.Stdout, &tint.Options{
 		AddSource: true,
 		Level:     slog.LevelInfo,

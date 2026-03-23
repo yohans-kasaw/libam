@@ -4,16 +4,11 @@ services:
     image: libam-backend
     ports:
       - "${PORT}:${PORT}"
-    environment:
-      GOOSE_MIGRATION_DIR: ${GOOSE_MIGRATION_DIR}
-      GOOSE_DRIVER: ${GOOSE_DRIVER}
-      PORT: ${PORT}
-      JWT_SIGNING_KEY: ${JWT_SIGNING_KEY}
-      GOOSE_DBSTRING: postgresql://postgres@libam-db/postgres?sslmode=disable
-      GIN_MODE: release
     depends_on:
       libam-db:
         condition: service_healthy
+    volumes:
+      - ./.env:/app/.env
     healthcheck:
       test: ["CMD-SHELL", "wget --spider http://localhost:${PORT}/health"]
       interval: 10s

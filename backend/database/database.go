@@ -1,7 +1,7 @@
 package database
 
 import (
-	"libam/internal/pkg"
+	"libam/internal/env"
 	"log/slog"
 	"os"
 
@@ -14,7 +14,7 @@ type Database struct {
 }
 
 func NewDatabase() *Database {
-	dsn := pkg.GetEnv("GOOSE_DBSTRING")
+	dsn := env.GetEnv("GOOSE_DBSTRING")
 
 	d := postgres.Open(dsn)
 	db, err := gorm.Open(d, &gorm.Config{})

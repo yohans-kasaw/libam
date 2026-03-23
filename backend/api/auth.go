@@ -2,7 +2,7 @@ package api
 
 import (
 	"errors"
-	"libam/internal/pkg"
+	"libam/internal/env"
 	"log/slog"
 	"net/http"
 	"strconv"
@@ -22,7 +22,7 @@ type UserClaim struct {
 }
 
 func NewAuth() *Auth {
-	jwtSecret := pkg.GetEnv("JWT_SIGNING_KEY")
+	jwtSecret := env.GetEnv("JWT_SIGNING_KEY")
 
 	return &Auth{
 		jwtSecret: jwtSecret,

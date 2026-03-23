@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	_ "libam/internal/env"
 	"log/slog"
 	"net/http"
 	"os"
@@ -11,7 +12,6 @@ import (
 
 	"libam/api"
 
-	"github.com/joho/godotenv"
 	"github.com/lmittmann/tint"
 )
 
@@ -23,11 +23,6 @@ func main() {
 			Level:     slog.LevelInfo,
 		},
 	)))
-
-	err := godotenv.Load()
-	if err != nil {
-		slog.Warn("Error loading .env file")
-	}
 
 	server := api.NewServer()
 
