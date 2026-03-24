@@ -4,7 +4,6 @@
 # TODO have cloud sql create here 
 # TODO what are terraform modules
 # TODO how do i delete it if there is already   deletion_protection = true
-# TODO is IAM access worth it? ip rotation won't be good idea? lets just add google cloud connector 
 
 terraform {
   required_providers {
@@ -56,6 +55,37 @@ resource "google_service_account" "libam-api-cloud-run" {
   display_name = "Libam API Service Account"
 }
 
+resource "random_password" "db_password" {
+  length           = 16
+  special          = true
+  override_special = "!#$%&*()-_=+[]{}<>:?"
+}
+
+resource "google_secret_manager_secret" "db_password" {
+  secret_id = "db_password"
+  replication {
+    auto {
+    }
+  }
+}
+
+resource "google_secret_manager_secret_version" "latest" {
+  secret      = google_secret_manager_secret.db_password.id
+  secret_data = random_password.db_password.result
+}
+
+resource "google_secret_manager_secret_iam_member" "db_password_secret_access" {
+  secret_id = google_secret_manager_secret.db_password.id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.libam-api-cloud-run.email}"
+}
+
+resource "google_sql_user" "postgres" {
+  name     = "postgres"
+  instance = google_sql_database_instance.libam.name
+  password = random_password.db_password.result
+}
+
 # database 
 resource "google_sql_database_instance" "libam" {
   name             = "libam"
@@ -71,30 +101,7 @@ resource "google_sql_database_instance" "libam" {
     ip_configuration {
       ipv4_enabled = true
     }
-
-    database_flags {
-      name  = "cloudsql.iam_authentication"
-      value = "on"
-    }
   }
-}
-
-resource "google_sql_user" "cloud-run" {
-  instance = google_sql_database_instance.libam.name
-  name     = trimsuffix(google_service_account.libam-api-cloud-run.email, ".gserviceaccount.com")
-  type     = "CLOUD_IAM_SERVICE_ACCOUNT"
-}
-
-resource "google_project_iam_member" "libam-db-client" {
-  project = google_sql_database_instance.libam.project
-  role    = "roles/cloudsql.client"
-  member  = "serviceAccount:${google_service_account.libam-api-cloud-run.email}"
-}
-
-resource "google_project_iam_member" "libam-db-instance-user" {
-  project = google_sql_database_instance.libam.project
-  role    = "roles/cloudsql.instanceUser"
-  member  = "serviceAccount:${google_service_account.libam-api-cloud-run.email}"
 }
 
 resource "google_secret_manager_secret" "app-env" {
@@ -116,6 +123,12 @@ resource "google_secret_manager_secret_iam_member" "app-env-secret-access" {
   member    = "serviceAccount:${google_service_account.libam-api-cloud-run.email}"
 }
 
+resource "google_project_iam_member" "cloud_sql_client" {
+  project = "libam-terraform"
+  role    = "roles/cloudsql.client"
+  member  = "serviceAccount:${google_service_account.libam-api-cloud-run.email}"
+}
+
 resource "google_cloud_run_v2_service" "libam-api" {
   name                = "libam-api"
   location            = var.region
@@ -135,8 +148,18 @@ resource "google_cloud_run_v2_service" "libam-api" {
       }
 
       env {
-        name  = "GOOSE_DBSTRING"
-        value = "postgresql://${google_sql_user.cloud-run.name}@/postgres?host=/cloudsql/${google_sql_database_instance.libam.connection_name}"
+        name  = "DB_PASSWORD"
+        value_source {
+          secret_key_ref {
+            secret = google_secret_manager_secret.db_password.secret_id
+            version = "latest"
+          }
+        }
+      }
+
+      env {
+        name  = "DB_HOST"
+        value = "/cloudsql/${google_sql_database_instance.libam.connection_name}"
       }
 
       volume_mounts {
@@ -173,8 +196,6 @@ resource "google_cloud_run_v2_service" "libam-api" {
   depends_on = [
     docker_registry_image.publish-images,
     google_secret_manager_secret_iam_member.app-env-secret-access,
-    google_project_iam_member.libam-db-instance-user,
-    google_project_iam_member.libam-db-client,
   ]
 }
 

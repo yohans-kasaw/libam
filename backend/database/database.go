@@ -22,7 +22,7 @@ func NewDatabase() *Database {
 	host := env.GetEnv("DB_HOST")
 
 	dsn := fmt.Sprintf(
-		"user=%s password=%s database=%s host=%s sslmode=disable",
+		"user=%s password=%s database=%s host=%s",
 		user,
 		pass,
 		name,
