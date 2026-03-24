@@ -1,7 +1,6 @@
 # TODO have the front end deployed and connected to also. 
 # TODO have auth to access libam api 
 # TODO bulding images in terraform is antipattern, it should be done on github actions
-# TODO replace cloud sql built from modules. 
 
 terraform {
   required_providers {
@@ -48,49 +47,17 @@ resource "docker_registry_image" "publish-images" {
   depends_on = [docker_image.libam-api-image]
 }
 
-# account
-resource "google_service_account" "libam-api-cloud-run" {
-  account_id   = "libam-api-cloud-run"
+module "service_account" {
+  source     = "terraform-google-modules/service-accounts/google"
+  version    = "~> 4.0"
+  project_id = var.project_id
+
+  names        = ["libam-api-cloud-run"]
   display_name = "Libam API Service Account"
-}
 
-# secret buckets
-resource "google_secret_manager_secret" "dot-env" {
-  secret_id = "dot-env"
-  replication {
-    auto {
-    }
-  }
-}
-
-resource "google_secret_manager_secret" "DB_PASSWORD" {
-  secret_id = "DB_PASSWORD"
-  replication {
-    auto {
-    }
-  }
-}
-
-# Iam permisions 
-resource "google_secret_manager_secret_iam_member" "DB_PASSWORD_secret_access" {
-  secret_id = google_secret_manager_secret.DB_PASSWORD.id
-  role      = "roles/secretmanager.secretAccessor"
-  member    = "serviceAccount:${google_service_account.libam-api-cloud-run.email}"
-}
-
-resource "google_secret_manager_secret_iam_member" "dot-env-secret-access" {
-  secret_id = google_secret_manager_secret.dot-env.id
-  role      = "roles/secretmanager.secretAccessor"
-  member    = "serviceAccount:${google_service_account.libam-api-cloud-run.email}"
-}
-
-resource "google_project_iam_member" "cloud_sql_client" {
-  project = var.project_id
-  role    = "roles/cloudsql.client"
-  member  = "serviceAccount:${google_service_account.libam-api-cloud-run.email}"
-
-  depends_on = [module.libam_cloud_sql]
-
+  project_roles = [
+    "${var.project_id}=>roles/cloudsql.client"
+  ]
 }
 
 module "libam_cloud_sql" {
@@ -116,6 +83,41 @@ module "libam_cloud_sql" {
   }
 }
 
+module "secret-manager" {
+  source     = "GoogleCloudPlatform/secret-manager/google"
+  version    = "~> 0.9"
+  project_id = var.project_id
+
+  secrets = [
+    {
+      name        = "DB_PASSWORD"
+      secret_data = module.libam_cloud_sql.generated_user_password
+    },
+    {
+      name        = "dot_env_prod_file"
+      secret_data = file("${path.root}/../backend/.env.prod")
+    }
+  ]
+
+  depends_on = [module.libam_cloud_sql]
+}
+
+module "secret_manager_iam" {
+  source  = "terraform-google-modules/iam/google//modules/secret_manager_iam"
+  version = "~> 8.1"
+
+  project = var.project_id
+  secrets = ["dot_env_prod_file", "DB_PASSWORD"]
+
+  bindings = {
+    "roles/secretmanager.secretAccessor" = [
+      "serviceAccount:${module.service_account.email}"
+    ]
+  }
+
+  depends_on = [module.secret-manager]
+}
+
 module "libam-api-cloud-run" {
   source  = "GoogleCloudPlatform/cloud-run/google//modules/v2"
   version = "~> 0.25"
@@ -125,7 +127,7 @@ module "libam-api-cloud-run" {
   location                      = var.region
   cloud_run_deletion_protection = false
 
-  service_account = google_service_account.libam-api-cloud-run.email
+  service_account = module.service_account.email
 
   containers = [
     {
@@ -143,14 +145,14 @@ module "libam-api-cloud-run" {
 
       env_secret_vars = {
         DB_PASSWORD = {
-          secret  = google_secret_manager_secret.DB_PASSWORD.secret_id
+          secret  = "DB_PASSWORD"
           version = "latest"
         }
       }
 
       volume_mounts = [
         {
-          name       = "dot-env-volume"
+          name       = "dot_env_prod_file_volume"
           mount_path = "/secrets"
         }
       ]
@@ -160,9 +162,9 @@ module "libam-api-cloud-run" {
 
   volumes = [
     {
-      name = "dot-env-volume"
+      name = "dot_env_prod_file_volume"
       secret = {
-        secret = google_secret_manager_secret.dot-env.secret_id
+        secret = "dot_env_prod_file"
         items = {
           version = "latest"
           path    = ".env"
@@ -187,24 +189,25 @@ module "libam-api-cloud-run" {
 
   depends_on = [
     docker_registry_image.publish-images,
-    module.libam_cloud_sql,
-    google_secret_manager_secret_version.latest,
-    google_secret_manager_secret_version.app-latest,
-    google_secret_manager_secret_iam_member.dot-env-secret-access,
-    google_secret_manager_secret_iam_member.DB_PASSWORD_secret_access,
-    google_project_iam_member.cloud_sql_client,
+    module.secret_manager_iam,
   ]
 }
 
-# setting values of secrets 
-resource "google_secret_manager_secret_version" "latest" {
-  secret      = google_secret_manager_secret.DB_PASSWORD.id
-  secret_data = module.libam_cloud_sql.generated_user_password
-
-  depends_on = [module.libam_cloud_sql]
+# Move the Service Account
+moved {
+  from = google_service_account.libam-api-cloud-run
+  to   = module.service_account.google_service_account.service_accounts["libam-api-cloud-run"]
 }
 
-resource "google_secret_manager_secret_version" "app-latest" {
-  secret      = google_secret_manager_secret.dot-env.id
-  secret_data = file("${path.root}/../backend/.env.prod")
+# Move the DB_PASSWORD Secret
+moved {
+  from = google_secret_manager_secret.DB_PASSWORD
+  to   = module.secret-manager.google_secret_manager_secret.secrets["DB_PASSWORD"]
 }
+
+# Move the dot-env Secret
+moved {
+  from = google_secret_manager_secret.dot-env
+  to   = module.secret-manager.google_secret_manager_secret.secrets["dot_env_prod_file"]
+}
+
