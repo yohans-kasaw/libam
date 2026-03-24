@@ -16,6 +16,7 @@ func getDBAddress(db *gorm.DB) string {
 	if err != nil || dbAddr == "" {
 		return "localhost/socket"
 	}
+
 	return dbAddr
 }
 
