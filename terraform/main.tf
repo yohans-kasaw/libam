@@ -1,9 +1,7 @@
 # TODO have the front end deployed and connected to also. 
 # TODO have auth to access libam api 
 # TODO bulding images in terraform is antipattern, it should be done on github actions
-# TODO have cloud sql create here 
-# TODO what are terraform modules
-# TODO how do i delete it if there is already   deletion_protection = true
+# TODO replace cloud sql built from modules. 
 
 terraform {
   required_providers {
@@ -19,7 +17,7 @@ terraform {
 }
 
 provider "google" {
-  project = "libam-terraform"
+  project = var.project_id
   region  = var.region
 }
 
@@ -55,14 +53,14 @@ resource "google_service_account" "libam-api-cloud-run" {
   display_name = "Libam API Service Account"
 }
 
-resource "random_password" "db_password" {
+resource "random_password" "DB_PASSWORD" {
   length           = 16
   special          = true
   override_special = "!#$%&*()-_=+[]{}<>:?"
 }
 
-resource "google_secret_manager_secret" "db_password" {
-  secret_id = "db_password"
+resource "google_secret_manager_secret" "DB_PASSWORD" {
+  secret_id = "DB_PASSWORD"
   replication {
     auto {
     }
@@ -70,12 +68,12 @@ resource "google_secret_manager_secret" "db_password" {
 }
 
 resource "google_secret_manager_secret_version" "latest" {
-  secret      = google_secret_manager_secret.db_password.id
-  secret_data = random_password.db_password.result
+  secret      = google_secret_manager_secret.DB_PASSWORD.id
+  secret_data = random_password.DB_PASSWORD.result
 }
 
-resource "google_secret_manager_secret_iam_member" "db_password_secret_access" {
-  secret_id = google_secret_manager_secret.db_password.id
+resource "google_secret_manager_secret_iam_member" "DB_PASSWORD_secret_access" {
+  secret_id = google_secret_manager_secret.DB_PASSWORD.id
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${google_service_account.libam-api-cloud-run.email}"
 }
@@ -83,7 +81,7 @@ resource "google_secret_manager_secret_iam_member" "db_password_secret_access" {
 resource "google_sql_user" "postgres" {
   name     = "postgres"
   instance = google_sql_database_instance.libam.name
-  password = random_password.db_password.result
+  password = random_password.DB_PASSWORD.result
 }
 
 # database 
@@ -104,8 +102,8 @@ resource "google_sql_database_instance" "libam" {
   }
 }
 
-resource "google_secret_manager_secret" "app-env" {
-  secret_id = "app-env"
+resource "google_secret_manager_secret" "dot-env" {
+  secret_id = "don-env"
   replication {
     auto {
     }
@@ -113,98 +111,99 @@ resource "google_secret_manager_secret" "app-env" {
 }
 
 resource "google_secret_manager_secret_version" "app-latest" {
-  secret      = google_secret_manager_secret.app-env.id
+  secret      = google_secret_manager_secret.dot-env.id
   secret_data = file("${path.root}/../backend/.env.prod")
 }
 
-resource "google_secret_manager_secret_iam_member" "app-env-secret-access" {
-  secret_id = google_secret_manager_secret.app-env.id
+resource "google_secret_manager_secret_iam_member" "dot-env-secret-access" {
+  secret_id = google_secret_manager_secret.dot-env.id
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${google_service_account.libam-api-cloud-run.email}"
 }
 
-resource "google_project_iam_member" "cloud_sql_client" {
-  project = "libam-terraform"
-  role    = "roles/cloudsql.client"
-  member  = "serviceAccount:${google_service_account.libam-api-cloud-run.email}"
-}
+module "libam-api-cloud-run" {
+  source  = "GoogleCloudPlatform/cloud-run/google//modules/v2"
+  version = "~> 0.25"
 
-resource "google_cloud_run_v2_service" "libam-api" {
-  name                = "libam-api"
-  location            = var.region
-  deletion_protection = false
+  service_name                  = "libam-api"
+  project_id                    = var.project_id
+  location                      = var.region
+  cloud_run_deletion_protection = false
 
-  template {
-    service_account = google_service_account.libam-api-cloud-run.email
+  service_account = google_service_account.libam-api-cloud-run.email
 
-    containers {
-      image = docker_image.libam-api-image.name
-
-      resources {
+  containers = [
+    {
+      container_image = docker_image.libam-api-image.name
+      resources = {
         limits = {
           cpu    = "1"
           memory = "512Mi"
         }
       }
 
-      env {
-        name  = "DB_PASSWORD"
-        value_source {
-          secret_key_ref {
-            secret = google_secret_manager_secret.db_password.secret_id
-            version = "latest"
-          }
+      env_vars = {
+        DB_HOST = "/cloudsql/${google_sql_database_instance.libam.connection_name}"
+      }
+
+      env_secret_vars = {
+        DB_PASSWORD = {
+          secret  = google_secret_manager_secret.DB_PASSWORD.secret_id
+          version = "latest"
         }
       }
 
-      env {
-        name  = "DB_HOST"
-        value = "/cloudsql/${google_sql_database_instance.libam.connection_name}"
-      }
+      volume_mounts = [
+        {
+          name       = "dot-env-volume"
+          mount_path = "/secrets"
+        }
+      ]
 
-      volume_mounts {
-        name       = "app-env-volume"
-        mount_path = "/secrets"
-      }
     }
+  ]
 
-    volumes {
-      name = "app-env-volume"
-      secret {
-        secret = google_secret_manager_secret.app-env.secret_id
-
-        items {
+  volumes = [
+    {
+      name = "dot-env-volume"
+      secret = {
+        secret = google_secret_manager_secret.dot-env.secret_id
+        items = {
           version = "latest"
           path    = ".env"
         }
       }
-    }
-
-    volumes {
+    },
+    {
       name = "cloudsql"
-      cloud_sql_instance {
+      cloud_sql_instance = {
         instances = [google_sql_database_instance.libam.connection_name]
       }
     }
+  ]
 
-    scaling {
-      min_instance_count = 1
-      max_instance_count = 1
-    }
+
+  members = ["allUsers"]
+
+  template_annotations = {
+    "autoscaling.knative.dev/minScale" = "1"
+    "autoscaling.knative.dev/maxScale" = "1"
   }
 
   depends_on = [
     docker_registry_image.publish-images,
-    google_secret_manager_secret_iam_member.app-env-secret-access,
+    google_secret_manager_secret_iam_member.dot-env-secret-access,
+    google_secret_manager_secret_iam_member.DB_PASSWORD_secret_access,
+    google_project_iam_member.cloud_sql_client,
+
+    # Add these two lines so Cloud Run waits for the actual secret data to exist!
+    google_secret_manager_secret_version.latest,
+    google_secret_manager_secret_version.app-latest
   ]
 }
 
-
-resource "google_cloud_run_v2_service_iam_member" "noauth" {
-  project  = google_cloud_run_v2_service.libam-api.project
-  location = google_cloud_run_v2_service.libam-api.location
-  name     = google_cloud_run_v2_service.libam-api.name
-
-  role   = "roles/run.invoker"
-  member = "allUsers"
+resource "google_project_iam_member" "cloud_sql_client" {
+  project = var.project_id
+  role    = "roles/cloudsql.client"
+  member  = "serviceAccount:${google_service_account.libam-api-cloud-run.email}"
 }

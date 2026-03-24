@@ -3,8 +3,14 @@ variable "libam-api-image-tag" {
   type        = string
   default = "latest"
 }
+variable "project_id" {
+  description = "Your Google Cloud Project ID"
+  type        = string
+  default     = "libam-terraform"
+}
 
 variable "region" {
+  description = "Your Google Cloud Region"
   type        = string
   default = "me-west1"
 }

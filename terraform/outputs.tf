@@ -1,3 +1,4 @@
-output "live_url" {
-  value = google_cloud_run_v2_service.libam-api.uri
+output "all_cloud_run_outputs" {
+  description = "Every output from the Cloud Run module"
+  value       = module.libam-api-cloud-run
 }
