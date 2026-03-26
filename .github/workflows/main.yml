@@ -1,0 +1,18 @@
+# TODO: there must be some sort of linter, lets check that
+name: Trying github actions
+run-name: ${{ github.actor }} this is github.actor
+on: [push]
+jobs:
+  see-what-github-actions-got:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "github.event_name ${{ github.event_name }}"
+      - run: echo "runner.os ${{ runner.os }}"
+      - run: echo "github.repository {{ github.repository }}  github.repository {{ github.repository }}"
+      - name: check out the repo man
+        uses: actions/checkout@v5
+      - run: echo "repo has been cloned mane using the above name syntax"
+      - name: we can now list the files because it has been cloned 
+        run: |
+          ls ${{ github.workspace }}
+      - run: echo "job status ${{ job.status }}"
